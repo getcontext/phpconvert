@@ -31,4 +31,13 @@ string Strings::replace(const string target, const string from,
 	return out;
 }
 
+string Strings::regexReplace(const string target, const string from,
+		const string to) {
+	std::string str = target;
+	std::string newtext = to;
+	boost::regex re(from);
+	std::string result = boost::regex_replace(str, re, newtext, boost::match_default | boost::format_all);
+	return result;
+}
+
 } /* namespace Salamon */

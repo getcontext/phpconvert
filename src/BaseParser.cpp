@@ -18,9 +18,14 @@ BaseParser::~BaseParser() {
 	// TODO Auto-generated destructor stub
 }
 
-void BaseParser::setPath(const string p) {
+void BaseParser::setSourceDir(const string p) {
 	// TODO Auto-generated destructor stub
-	path = p;
+	sourceDir = p;
+}
+
+void BaseParser::setOutputDir(const string p) {
+	// TODO Auto-generated destructor stub
+	outputDir = p;
 }
 
 void BaseParser::setRecursive(bool val) {

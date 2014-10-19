@@ -8,12 +8,14 @@
 #ifndef BASEPARSER_H_
 #define BASEPARSER_H_
 
-#include <iostream>
+#include <iostream>     // std::cout
+#include <iterator>     // std::ostream_iterator
+#include <vector>       // std::vector
+#include <algorithm>    // std::copy
 #include <fstream>
 #include <string>
 #include <vector>
 #include <set>
-
 using namespace std;
 
 namespace Salamon {
@@ -36,16 +38,19 @@ public:
 		string mainType;
 		vector<string> types;
 		string content;
+		string mainTypeFull;
 	};
 
 	BaseParser();
 	virtual ~BaseParser();
 	virtual void parse() = 0;
-	void setPath(const string path);
+	void setSourceDir(const string path);
+	void setOutputDir(const string path);
 	void setRecursive(const bool val);
 	bool isRecurisve();
 protected:
-	string path;
+	string sourceDir;
+	string outputDir;
 	bool recursive;
 	vector<File>* result;
 };

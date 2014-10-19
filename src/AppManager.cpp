@@ -27,7 +27,7 @@ void AppManager::run(AppParams* params) {
 	ZendParser* worker = new ZendParser();
 	BaseParser* w = worker;
 	parser->setWorker(w);
-	parser->parse(params->path, params->recursive);
+	parser->parse(params);
 }
 
 } /* namespace Salamon */

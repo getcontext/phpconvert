@@ -9,19 +9,20 @@
 
 namespace Salamon {
 
-
-AppParams* AppParams::createFromRequest(int argc,char* argv[]) {
+AppParams* AppParams::createFromRequest(int argc, char* argv[]) {
 	AppParams* obj = new AppParams();
 	obj->setValid(false);
 	obj->recursive = false;
 
-	for (int i = 1; i < argc; i+=2) {
+	for (int i = 1; i < argc; i += 2) {
 		string current = argv[i];
 		if (current.compare("-r") == 0) {
 			obj->recursive = true;
 		} else if (current.compare("-d") == 0) {
 			obj->path = argv[i + 1];
 			obj->setValid(true);
+		} else if (current.compare("-o") == 0) {
+			obj->outputPath = argv[i + 1];
 		}
 	}
 
@@ -37,7 +38,7 @@ bool AppParams::isValid() {
 }
 
 void AppParams::setValid(const bool valid) {
-	this->valid=valid;
+	this->valid = valid;
 }
 
 } /* namespace Salamon */

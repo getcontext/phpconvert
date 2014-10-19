@@ -9,6 +9,8 @@
 #define PARSERMANAGER_H_
 #include <string>
 #include "BaseParser.h"
+#include "AppParams.h"
+
 using namespace std;
 
 namespace Salamon {
@@ -19,7 +21,7 @@ public:
 	virtual ~ParserManager();
 	void setWorker(BaseParser *p);
 	BaseParser *getParser();
-	void parse(const string path, const bool recursive);
+	void parse(AppParams* params);
 protected:
 	BaseParser *parser;
 };

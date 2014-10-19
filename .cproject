@@ -28,6 +28,7 @@
 								<option id="gnu.cpp.compiler.option.include.paths.621723247" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;C:\boost_1_56_0&quot;"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.dialect.std.1586421319" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1425636162" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.926808032" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug">
@@ -36,6 +37,7 @@
 								<option id="gnu.c.compiler.option.include.paths.498548509" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;C:\boost_1_56_0&quot;"/>
 								</option>
+								<option id="gnu.c.compiler.option.dialect.std.823232838" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.default" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1249620130" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.1163446939" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug"/>
@@ -44,6 +46,8 @@
 									<listOptionValue builtIn="false" value="&quot;C:\boost_1_56_0\stage\lib&quot;"/>
 								</option>
 								<option id="gnu.cpp.link.option.libs.1789181920" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="boost_filesystem-mgw48-mt-d-1_56"/>
+									<listOptionValue builtIn="false" value="boost_system-mgw48-mt-d-1_56"/>
 									<listOptionValue builtIn="false" value="boost_regex-mgw48-mt-d-1_56"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1605912246" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">

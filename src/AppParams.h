@@ -18,6 +18,7 @@ class AppParams {
 public:
 	string path;
 	bool recursive;
+	string outputPath;
 	AppParams* createFromRequest(int argc,char* argv[]);
 	bool isValid();
 private:

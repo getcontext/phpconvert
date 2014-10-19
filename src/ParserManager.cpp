@@ -26,9 +26,10 @@ BaseParser* ParserManager::getParser() {
 	return parser;
 }
 
-void ParserManager::parse(const string path, const bool recursive) {
-	getParser()->setPath(path);
-	getParser()->setRecursive(recursive);
+void ParserManager::parse(AppParams* params) {
+	getParser()->setSourceDir(params->path);
+	getParser()->setRecursive(params->recursive);
+	getParser()->setOutputDir(params->outputPath);
 	getParser()->parse();
 }
 

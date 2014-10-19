@@ -7,7 +7,6 @@
  *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
  */
 
-
 #ifndef ZENDPARSER_H_
 #define ZENDPARSER_H_
 
@@ -23,11 +22,6 @@ public:
 	ZendParser();
 	virtual ~ZendParser();
 	virtual void parse();
-	vector<string> extractMainType(const string line);
-	vector<string> extractTypes(const string line);
-	vector<string> filterTypes(vector<string> types);
-	vector<PreparedType> generatePreparedTypes(vector<string> types);
-	const string extractNamespace(const string className);
 
 	DirectoryReader* getReader();
 	Regexer* getRegexer();
@@ -42,9 +36,17 @@ public:
 protected:
 	void setupReader();
 	File buildFile(DirectoryReader::Item* item);
+	vector<string> extractMainType(const string line);
+	vector<string> extractTypes(const string line);
+	vector<string> filterTypes(vector<string> types);
+	vector<PreparedType> generatePreparedTypes(vector<string>& types, string mainType);
+	const string extractNamespace(const string className);
+	const string toNamespace(const string className);
+	void readBuiltInTypes();
 private:
 	DirectoryReader* reader;
 	Regexer regexer;
+	set<string> builtInTypes;
 
 };
 
