@@ -106,6 +106,7 @@ DirectoryReader::DirectoryReader() {
 
 DirectoryReader::DirectoryReader(const char* dir) :
 		path(dir) {
+	result = new vector<DirectoryReader::Item>();
 }
 
 DirectoryReader::~DirectoryReader() {
@@ -172,6 +173,10 @@ string DirectoryReader::readTextFile(const string path) {
 }
 void DirectoryReader::createDir(const string path) {
 	boost::filesystem::create_directories(path);
+}
+
+void DirectoryReader::removeDir(const string path) {
+	boost::filesystem::remove_all(path);
 }
 
 }

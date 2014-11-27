@@ -10,21 +10,17 @@
 namespace Salamon {
 
 BaseParser::BaseParser() {
-	// TODO Auto-generated constructor stub
-
+	setRecursive(false);
 }
 
 BaseParser::~BaseParser() {
-	// TODO Auto-generated destructor stub
 }
 
 void BaseParser::setSourceDir(const string p) {
-	// TODO Auto-generated destructor stub
 	sourceDir = p;
 }
 
 void BaseParser::setOutputDir(const string p) {
-	// TODO Auto-generated destructor stub
 	outputDir = p;
 }
 

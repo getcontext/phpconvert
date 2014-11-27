@@ -38,6 +38,30 @@ string Regexer::find(const string& target, const string pattern, int index) {
 	return out;
 
 }
+void Regexer::findAll(vector<string>& out, const string& target,const string pattern, int index){
+	out.clear();
+	boost::regex expression(pattern);
+	std::string::const_iterator start, end;
+	start = target.begin();
+	end = target.end();
+	boost::match_results<std::string::const_iterator> what;
+	boost::match_flag_type flags = boost::match_default;
+
+	while (boost::regex_search(start, end, what, expression, flags)) {
+		if (index < 0) {
+			for (unsigned i = 0; i < what.size(); ++i) {
+				out.push_back((string) what[i]);
+			}
+		} else {
+			out.push_back((string) what[index]);
+		}
+		// update search position:
+		start = what[0].second;
+		// update flags:
+		flags |= boost::match_prev_avail;
+		flags |= boost::match_not_bob;
+	}
+}
 
 vector<string> Regexer::findAll(const string& target, const string pattern,
 		int index) {
@@ -48,6 +72,7 @@ vector<string> Regexer::findAll(const string& target, const string pattern,
 	end = target.end();
 	boost::match_results<std::string::const_iterator> what;
 	boost::match_flag_type flags = boost::match_default;
+
 	while (boost::regex_search(start, end, what, expression, flags)) {
 		if (index < 0) {
 			for (unsigned i = 0; i < what.size(); ++i) {

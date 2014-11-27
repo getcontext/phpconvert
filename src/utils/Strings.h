@@ -9,12 +9,11 @@
 #define STRINGS_H_
 
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/join.hpp>
 #include <boost/regex.hpp>
-
 
 using namespace std;
 using namespace boost;
-
 
 namespace Salamon {
 
@@ -22,9 +21,11 @@ class Strings {
 public:
 	Strings();
 	virtual ~Strings();
-	vector<string> split(const string delim, const string target);
-	string replace(const string target,const string from, const string to);
-	string regexReplace(const string target,const string from, const string to);
+	void split(vector<string>& out, const string& delim, const string& target);
+	string join(vector<string>& in, string& delim);
+	void replace(string& target, string& from, string& to);
+	void regexReplace(string& target, string& from, string& to);
+	void regexReplace(string* target, string& from, string& to);
 };
 
 } /* namespace Salamon */

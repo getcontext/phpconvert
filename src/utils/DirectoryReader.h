@@ -47,6 +47,7 @@ public:
 	string readTextFile(const string path);
 	bool writeTextFile(const string path, const string& content);
 	void createDir(const string path);
+	void removeDir(const string path);
 	/*
 	 * windows based systems directory separator
 	 */

@@ -22,6 +22,7 @@ public:
 	virtual ~Regexer();
 	string find(const string& target,const string pattern, int index);
 	vector<string> findAll(const string& target,const string pattern, int index);
+	void findAll(vector<string>& out, const string& target,const string pattern, int index);
 	void test(string target, string pattern);
 };
 

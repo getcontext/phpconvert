@@ -8,14 +8,16 @@
 #ifndef BASEPARSER_H_
 #define BASEPARSER_H_
 
-#include <iostream>     // std::cout
-#include <iterator>     // std::ostream_iterator
-#include <vector>       // std::vector
-#include <algorithm>    // std::copy
+#include <iostream>
+#include <iterator>
+#include <vector>
+#include <algorithm>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <set>
+#include <exception>
+
 using namespace std;
 
 namespace Salamon {
@@ -26,6 +28,18 @@ public:
 		string type;
 		string usage;
 		string alias;
+		string raw;
+		string replace;
+		bool isMain = false;
+		string extends;
+		vector<string> implements;
+
+		bool operator == (PreparedType& obj) const {
+			return type.compare(obj.type) == 0 && raw.compare(obj.raw) == 0;
+		}
+		bool operator < (PreparedType const& obj) const {
+			return type.size() > obj.type.size() && raw.size() > obj.raw.size();
+		}
 	};
 
 	struct File {
@@ -34,11 +48,14 @@ public:
 		string rootPath;
 		string namespaceName;
 		bool isValid;
-		vector<PreparedType> preparedTypes;
 		string mainType;
-		vector<string> types;
+		string firstMainTypeFull;
 		string content;
-		string mainTypeFull;
+
+		set<string>* mainTypes;
+		vector<string> types;
+		vector<PreparedType> prepTypes;
+		vector<PreparedType> prepTypesMain;
 	};
 
 	BaseParser();
@@ -52,7 +69,6 @@ protected:
 	string sourceDir;
 	string outputDir;
 	bool recursive;
-	vector<File>* result;
 };
 
 } /* namespace Salamon */

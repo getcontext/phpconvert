@@ -13,9 +13,7 @@
 #include "AppManager.h"
 #include "SystemException.h"
 
-//#include "utils/Regexer.h"
-//#include "utils/DirectoryReader.h"
-//#include "plugin/ZendParser.h"
+#include "utils/Bench.h"
 
 #include <boost/regex.hpp>
 
@@ -23,9 +21,14 @@ using namespace std;
 using namespace Salamon;
 
 int main(int argc, char* argv[]) {
-	AppParams p;
-	AppParams* appParams = p.createFromRequest(argc, argv);
-	AppManager* app = new AppManager();
+	Bench b;
+	b.setStart();
+		
+	AppParams* appParams;
+	AppManager* app;
+	
+	appParams = (new AppParams())->createFromRequest(argc, argv);
+	app = new AppManager();
 
 	try {
 		app->run(appParams);
@@ -35,15 +38,7 @@ int main(int argc, char* argv[]) {
 		cout << e.what();
 	}
 
-
-//	DirectoryReader r;
-//	string content = r.readTextFile("D:\\workspace\\Zend\\Acl.php");
-//	string content = r.readTextFile("D:\\workspace\\Zend\\Auth.php");
-//	string content = r.readTextFile("D:\\workspace\\Zend\\Exception.php");
-//
-//	Regexer reg;
-//	reg.test(content, ZendParser::RGX_MAIN_TYPE);
-
-
+	b.setStop();
+	cout << b.getDiff() << "\n";
 	return 0;
 }

@@ -32,22 +32,72 @@ public:
 	static const string RGX_STATIC_CALL;
 	static const string RGX_MAIN_TYPE;
 	static const string RGX_THROW_NEW;
+	static const char* RGX_BUILTIN_TYPE;
+
+	File buildFile(DirectoryReader::Item* item,
+			vector<pair<string, string> >& out, vector<string>& tmpOut,
+			vector<string>& tmp);
 
 protected:
 	void setupReader();
-	File buildFile(DirectoryReader::Item* item);
-	vector<string> extractMainType(const string line);
-	vector<string> extractTypes(const string line);
-	vector<string> filterTypes(vector<string> types);
-	vector<PreparedType> generatePreparedTypes(vector<string>& types, string mainType);
-	const string extractNamespace(const string className);
-	const string toNamespace(const string className);
 	void readBuiltInTypes();
+	void readKeywords();
+
+	void extractTypes(const string& line, vector<pair<string, string> >& out,
+			vector<string>& tmp);
+	void extractMainType(File& file, vector<string>& out, vector<string>& tmp);
+
+	void filterPreparedTypes(vector<PreparedType>& types,
+			vector<PreparedType>& out);
+
+	void generatePairs(vector<pair<string, string> >& out, vector<string>& src);
+
+	void generatePreparedTypeFull(PreparedType& outPrep,
+			vector<string>& tmpVect);
+
+	void generatePreparedTypes(File& file, vector<string>& tmp);
+
+	void generatePreparedTypesGlobal(vector<string>& tmp);
+
+	void extractNamespace(const string& className, string& out,
+			vector<string>& tmp);
+	void generateNamespace(const string& className, string& out);
+	void addNamespace(File& file);
+
+	void addUsages(File& file, set<string> tmpSet);
+
+	void replaceTypes(File& file);
+	void replaceTypesMain(File& file);
+	void replaceTypesGlobal(File& file);
+	void replaceTypesBuiltIn(File& file);
+
+	void prepareTypesMain(File& file, vector<string>& out, vector<string>& tmp);
+	void prepareTypes(File& file, vector<pair<string, string> >& out,
+			vector<string>& tmp);
+
+	string generateAlias(vector<string>& type, unsigned int parts);
+	string generateAlias(string& type, unsigned int parts, vector<string>& tmp);
+
+	void writeTypesRegistryFile();
+	void buildFiles(File file, vector<string> tmpOut, int& processed,
+			vector<DirectoryReader::Item>* readerResult,
+			vector<pair<string, string> >& tmpOutPairs,
+			vector<string>& tmpVector);
+	void sortFaster(vector<PreparedType>& out);
+	void sortSlower(vector<PreparedType>& out);
+
 private:
 	DirectoryReader* reader;
-	Regexer regexer;
-	set<string> builtInTypes;
+	Regexer* regexer;
+	Strings* strings;
 
+	set<string>* builtInTypes;
+	set<string>* keywords;
+
+	vector<PreparedType>* typesRegistry;
+	vector<PreparedType>* typesRegistryUnfiltered;
+
+	vector<File>* results;
 };
 
 } /* namespace Salamon */

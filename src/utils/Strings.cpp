@@ -18,26 +18,25 @@ Strings::~Strings() {
 	// TODO Auto-generated destructor stub
 }
 
-vector<string> Strings::split(const string delim, const string source) {
-	vector<string> out; // #2: Search for tokens
-	boost::split(out, source, is_any_of(delim), token_compress_on);
-	return out;
+void Strings::split(vector<string>& out, const string& delim, const string& source) {
+	out.clear();
+	if (source.find(delim) != string::npos)
+		boost::split(out, source, is_any_of(delim), token_compress_on);
+	else
+		out.push_back(source);
+}
+string Strings::join(vector<string>& in, string& delim) {
+	return boost::algorithm::join(in, delim);
 }
 
-string Strings::replace(const string target, const string from,
-		const string to) {
-	string out = target;
-	boost::replace_all(out, from, to);
-	return out;
+void Strings::replace(string& target, string& from, string& to) {
+	boost::replace_all(target, from, to);
 }
 
-string Strings::regexReplace(const string target, const string from,
-		const string to) {
-	std::string str = target;
-	std::string newtext = to;
+void Strings::regexReplace(string& target, string& from, string& to) {
 	boost::regex re(from);
-	std::string result = boost::regex_replace(str, re, newtext, boost::match_default | boost::format_all);
-	return result;
+	target = boost::regex_replace(target, re, to,
+			boost::match_default | boost::format_all);
 }
 
 } /* namespace Salamon */

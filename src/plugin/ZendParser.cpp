@@ -14,17 +14,29 @@ const string ZendParser::RGX_NEW = "new\\s+([A-Za-z0-9_]+)";
 const string ZendParser::RGX_SIGNATURE = "([A-Za-z0-9_]+)\\s+\\$[a-zA-Z0-9_]+";
 const string ZendParser::RGX_STATIC_CALL = "([A-Za-z0-9_]+)::";
 const string ZendParser::RGX_MAIN_TYPE =
-		"(final|abstract)?[\\s\n]*(class|interface)[\\s\n]+([A-Za-z0-9_]+)[\\s\n]*(extends[\\s\n]+([A-Za-z0-9_\\s\n]+))?([\\s\n]*implements[\\s\n]+([A-Za-z0-9_ ,\\s\n]+))?[\\s\n]?\\{";
+		"(final|abstract)?[\\s\n]*(class|interface)[\\s\n]+([A-Za-z0-9_]+)[\\s\n]*(extends[\\s\n]+([A-Za-z0-9_]+)[\\s\n]*)?([\\s\n]*implements[\\s\n]+([A-Za-z0-9_ ,\\s\n]+))?[\\s\n]?\\{";
 const string ZendParser::RGX_THROW_NEW = "throw new\\s+([A-Za-z0-9_]+)";
+const char* ZendParser::RGX_BUILTIN_TYPE =
+		"([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
 
 ZendParser::ZendParser() {
 	reader = new DirectoryReader();
-//	builtInTypes = new set<string>();
+	strings = new Strings();
+
+	results = new vector<File>();
+	typesRegistry = new vector<PreparedType>();
+	typesRegistryUnfiltered = new vector<PreparedType>();
+
 	readBuiltInTypes();
+	readKeywords();
 }
 
 ZendParser::~ZendParser() {
-	// TODO Auto-generated destructor stub
+	delete reader;
+	delete strings;
+	delete results;
+	delete typesRegistry;
+	delete typesRegistryUnfiltered;
 }
 
 DirectoryReader* ZendParser::getReader() {
@@ -35,182 +47,376 @@ void ZendParser::setupReader() {
 	reader->setPath(sourceDir.c_str());
 }
 
-void ZendParser::parse() {
-	setupReader();
-	getReader()->read(getReader()->getPath(), "/");
-	vector<DirectoryReader::Item> *results = reader->getResults();
-	getReader()->createDir(outputDir);
-	Strings s;
-	int processed = 0;
-	for (vector<DirectoryReader::Item>::iterator it = results->begin();
-			it != results->end(); ++it) {
-//		if (it->name.compare("Exception.php") != 0) {
-//			continue;
-//		}
-		if (!it->isFile) {
+void ZendParser::addNamespace(File& file) {
+	if (file.mainType.empty())
+		return;
+	string tmp = "<?php\n\nnamespace " + file.namespaceName + ";\n\n";
+	string rep = "<?php";
+	this->strings->replace(file.content, rep, tmp);
+}
+
+void ZendParser::replaceTypesBuiltIn(File& file) {
+	string replaceFormat, type;
+	char out[250];
+	for (set<string>::iterator it = builtInTypes->begin();
+			it != builtInTypes->end(); ++it) {
+		type = *it;
+		if (type.empty() || file.content.find(type) == string::npos)
+			continue;
+
+		if (this->builtInTypes->find(type) != this->builtInTypes->end()) {
+			sprintf(out, RGX_BUILTIN_TYPE, type.c_str());
+			string regexSearch(out);
+			replaceFormat = "$1\\\\" + type + "$3";
+			strings->regexReplace(file.content, regexSearch, replaceFormat);
+			strings->regexReplace(file.firstMainTypeFull, regexSearch,
+					replaceFormat);
+
+			for (PreparedType val : file.prepTypes) {
+				if (val.isMain) {
+					strings->regexReplace(val.raw, regexSearch, replaceFormat);
+					strings->regexReplace(val.replace, regexSearch,
+							replaceFormat);
+				}
+			}
+		}
+	}
+}
+
+void ZendParser::addUsages(File& file, set<string> tmpSet) {
+	if (file.mainType.empty())
+		return;
+	tmpSet.clear();
+	string replace = "\n\n\n";
+	for (PreparedType& type : file.prepTypes) {
+		if (type.type.compare(file.mainType) != 0
+				&& this->builtInTypes->find(type.type)
+						== this->builtInTypes->end()) {
+			if (tmpSet.find(type.type) != tmpSet.end()) {
+				continue;
+			}
+			replace += "use " + type.usage + " as " + type.alias + ";\n";
+			tmpSet.insert(type.type);
+		}
+	}
+	replace += "\n\n\n";
+	replace += file.firstMainTypeFull;
+	this->strings->replace(file.content, file.firstMainTypeFull, replace);
+}
+
+void ZendParser::replaceTypes(File& file) {
+	string replace, replaceFormat, type, regexSearch;
+	vector<PreparedType> tmp;
+	for (PreparedType& type : file.prepTypes) {
+		if (this->builtInTypes->find(type.type) == this->builtInTypes->end()) {
+
+//				this->strings->replace(type.replace, type.type, type.alias);
+//				this->strings->replace(file.content, type.raw, type.replace);
+//				this->strings->replace(file.content, type.type, type.alias);
+			regexSearch = "([^'\"])(" + type.type + ")([^'\"])";
+			replaceFormat = "$1 " + type.alias + " $3";
+			strings->regexReplace(file.content, regexSearch, replaceFormat);
+		}
+	}
+}
+
+void ZendParser::replaceTypesMain(File& file) {
+	string replace;
+	for (PreparedType& type : file.prepTypesMain) {
+		if (this->builtInTypes->find(type.type) == this->builtInTypes->end()) {
+			replace = type.raw;
+			this->strings->replace(replace, type.type, type.alias);
+			this->strings->replace(file.content, type.raw, replace);
+		}
+	}
+}
+
+void ZendParser::replaceTypesGlobal(File& file) {
+	PreparedType typeCopy;
+	vector<PreparedType>::iterator type = typesRegistry->begin();
+	for (; type != typesRegistry->end(); ++type) {
+		typeCopy = *type;
+		if (file.content.find(typeCopy.type) == string::npos
+				|| this->builtInTypes->find(typeCopy.type)
+						!= this->builtInTypes->end()) {
 			continue;
 		}
+		this->strings->replace(file.content, typeCopy.type, typeCopy.alias);
+	}
+}
 
-		File file = buildFile(&(*it));
+void ZendParser::writeTypesRegistryFile() {
+	string typesRegistryString;
+	vector<PreparedType>::iterator type = typesRegistry->begin();
+	for (; type != typesRegistry->end(); ++type) {
+		typesRegistryString += (*type).type + " | " + (*type).raw + "\n";
+	}
+	getReader()->writeTextFile(outputDir + "\\typesregistry.txt",
+			typesRegistryString);
+}
 
+void ZendParser::buildFiles(File file, vector<string> tmpOut, int& processed,
+		vector<DirectoryReader::Item>* readerResult,
+		vector<pair<string, string> >& tmpOutPairs, vector<string>& tmpVector) {
+	for (vector<DirectoryReader::Item>::iterator it = readerResult->begin();
+			it != readerResult->end(); ++it) {
+		if (!it->isFile || it->name.find(".php") == string::npos) {
+			continue;
+		}
+		//		if (it->name.find("Abstract.php") == string::npos) {
+		//			continue;
+		//		}
+		file = buildFile(&(*it), tmpOutPairs, tmpOut, tmpVector);
+		processed++;
 		if (!file.isValid) {
 			continue;
 		}
-//		cout << file.fullPath << "\n";
-		string tmp;
-
-		getReader()->createDir(outputDir + it->dir);
-
-		for (PreparedType& type : file.preparedTypes) {
-			if (type.type.compare(file.mainType) != 0
-					&& this->builtInTypes.find(type.type)
-							!= this->builtInTypes.end()) {
-				const char* formatString;
-				string r;
-				formatString = "$1\\\\$2$3";
-				r = "([^\\\\/_[:alnum:]])(" + type.type + ")([^[:alnum:]])";
-				file.content = s.regexReplace(file.content, r, formatString);
-			}
-
+		file.rootPath = it->dir;
+		for (PreparedType type : file.prepTypes) {
+			typesRegistryUnfiltered->push_back(type);
 		}
-
-		tmp = "<?php\n\nnamespace " + file.namespaceName + ";\n\n";
-		file.content = s.replace(file.content, "<?php", tmp);
-
-		tmp = "\n\n\n";
-		for (PreparedType& type : file.preparedTypes) {
-			if (type.type.compare(file.mainType) != 0
-					&& this->builtInTypes.find(type.type)
-							== this->builtInTypes.end()) {
-				tmp += "use " + type.usage + " as " + type.alias + ";\n";
-			}
+		for (PreparedType type : file.prepTypesMain) {
+			typesRegistryUnfiltered->push_back(type);
 		}
-		tmp += "\n\n\n";
-		file.content = s.replace(file.content, file.mainTypeFull,
-				tmp + file.mainTypeFull);
+		results->push_back(file);
+	}
+}
 
-		for (PreparedType& type : file.preparedTypes) {
-			if (this->builtInTypes.find(type.type)
-					== this->builtInTypes.end()) {
-				file.content = s.replace(file.content, type.type, type.alias);
-			}
-		}
+void ZendParser::parse() {
+	setupReader();
 
-		getReader()->writeTextFile(outputDir + it->dir + file.name,
-				file.content);
+	getReader()->removeDir(outputDir);
+	getReader()->createDir(outputDir);
 
-		processed++;
-		cout << "finished : " + file.fullPath + "\n";
-//		break;
+	if (isRecurisve())
+		getReader()->read(getReader()->getPath(), "/");
+	else
+		getReader()->read();
+
+	vector<DirectoryReader::Item> *readerResult = reader->getResults();
+
+	int generated = 0, processed = 0;
+	vector<string> tmpOut, tmpVector;
+	set<string> tmpSet;
+	vector<pair<string, string>> tmpOutPairs;
+	File file;
+
+	buildFiles(file, tmpOut, processed, readerResult, tmpOutPairs, tmpVector);
+	filterPreparedTypes(*typesRegistryUnfiltered, *typesRegistry);
+	writeTypesRegistryFile();
+	generatePreparedTypesGlobal(tmpVector);
+
+	for (vector<ZendParser::File>::iterator file = results->begin();
+			file != results->end(); ++file) {
+
+//		if (file->name.compare("View.php") != 0) {
+//			continue;
+//		}
+//		if (file->name.compare("Role.php") != 0) {
+//			continue;
+//		}
+//		if (file->name.compare("Registry.php")) {
+//			continue;
+//		}
+
+		getReader()->createDir(outputDir + "\\" + file->rootPath);
+
+		replaceTypesBuiltIn(*file);
+		addNamespace(*file);
+		addUsages(*file, tmpSet);
+//		replaceTypesMain(*file);
+		replaceTypes(*file);
+		replaceTypesGlobal(*file);
+
+		getReader()->writeTextFile(
+				outputDir + "\\" + file->rootPath + file->name, file->content);
+		generated++;
 	}
 
-	cout << "Total files processed : " << processed << "\n\n";
-
+	cout << "\n";
+	cout << "Total files processed : " << processed << "\n";
+	cout << "Total types found : " << typesRegistry->size() << "\n";
+	cout << "Total files generated : " << generated << "\n";
+	cout << "\n";
 	cout << "finished...";
 }
 
-vector<string> ZendParser::extractMainType(const string line) {
-	vector<string> out;
-	vector<string> tmp;
-	Regexer r;
-	tmp = r.findAll(line.c_str(), RGX_MAIN_TYPE, -1);
-	if (tmp.size() > 0) {
-		out.push_back(tmp[0]);
-		out.push_back(tmp[3]);
-		out.push_back(tmp[5]);
-		out.push_back(tmp[7]);
+void ZendParser::extractTypes(const string& line,
+		vector<pair<string, string>>& out, vector<string>& tmp) {
+	vector<string> tmpOut;
+	tmp.clear();
+	const char* source = line.c_str();
+	regexer->findAll(tmp, source, RGX_NEW, -1);
+	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
+	regexer->findAll(tmp, source, RGX_INSTANCEOF, -1);
+	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
+	regexer->findAll(tmp, source, RGX_SIGNATURE, -1);
+	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
+	regexer->findAll(tmp, source, RGX_STATIC_CALL, -1);
+	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
+//	regexer->findAll(tmp, source, RGX_THROW_NEW, -1);
+//	out.insert(out.begin(), tmp.begin(), tmp.end());
+	generatePairs(out, tmpOut);
+	tmpOut.clear();
+	tmp.clear();
+}
+
+void ZendParser::prepareTypes(File& file, vector<pair<string, string>>& out,
+		vector<string>& tmp) {
+	extractTypes(file.content, out, tmp);
+	PreparedType prepType;
+	for (pair<string, string> pair : out) {
+		prepType.type = pair.first;
+		prepType.raw = pair.second;
+		prepType.replace = pair.second;
+		file.prepTypes.push_back(prepType);
 	}
-	return out;
+	vector<PreparedType> outPrep;
+	filterPreparedTypes(file.prepTypes, outPrep);
+	file.prepTypes = outPrep;
+	generatePreparedTypes(file, tmp);
 }
 
-vector<string> ZendParser::extractTypes(const string line) {
-	vector<string> out;
-	vector<string> tmp;
+void ZendParser::extractMainType(File& file, vector<string>& out,
+		vector<string>& tmp) {
+	out.clear();
+	tmp.clear();
+	int step = 7;
+	regexer->findAll(tmp, file.content.c_str(), RGX_MAIN_TYPE, -1);
+//	if (file.name.compare("Role.php") == 0) {
+//		for (string v : tmp) {
+//			cout << v + "=\n";
+//		}
+//		cout << "\n";
+//	}
+	size_t size = tmp.size();
+	if (size > 0) {
+		for (size_t i = 0; i < size - 1; i += step) {
+			out.push_back(tmp[0]);
+			out.push_back(tmp[3]); //class|interface
 
-	Regexer r;
+			out.push_back(tmp[4]);
+			out.push_back(tmp[5]); //extends
 
-	tmp = r.findAll(line.c_str(), RGX_NEW, 1);
-	out.insert(out.begin(), tmp.begin(), tmp.end());
-	tmp = r.findAll(line.c_str(), RGX_INSTANCEOF, 1);
-	out.insert(out.begin(), tmp.begin(), tmp.end());
-	tmp = r.findAll(line.c_str(), RGX_SIGNATURE, 1);
-	out.insert(out.begin(), tmp.begin(), tmp.end());
-	tmp = r.findAll(line.c_str(), RGX_STATIC_CALL, 1);
-	out.insert(out.begin(), tmp.begin(), tmp.end());
-	tmp = r.findAll(line.c_str(), RGX_THROW_NEW, 1);
-	out.insert(out.begin(), tmp.begin(), tmp.end());
-
-	return out;
+			out.push_back(tmp[6]);
+			out.push_back(tmp[7]); //implements
+		}
+	}
 }
 
-ZendParser::File ZendParser::buildFile(DirectoryReader::Item* item) {
+void ZendParser::prepareTypesMain(File& file, vector<string>& out,
+		vector<string>& tmp) {
+	out.clear();
+	tmp.clear();
 
-	File file;
+	file.isValid = false;
+
+	extractMainType(file, out, tmp);
+
+	if (out.size() <= 0) {
+		return;
+	}
+
 	file.isValid = true;
+	string className, fileName, mainTypeFull, mainType, extends, implements,
+			delim;
+	size_t found, size;
+
+	size = out.size();
+	int step = 6;
+	PreparedType tmpPrepType;
+	PreparedType prepType;
+	prepType.isMain = true;
+	for (unsigned int i = 0; i < size - 1; i += step) {
+		mainTypeFull = out[i];
+		mainType = out[i + 1];
+		found = mainType.find("_");
+		extends = out[i + 3];
+		implements = out[i + 5];
+
+		prepType.type = mainType;
+		prepType.raw = mainTypeFull;
+		prepType.replace = mainTypeFull;
+
+		this->strings->split(tmp, "_", mainType);
+		className = tmp[tmp.size() - 1];
+
+		this->strings->split(tmp, ".", file.name);
+		fileName = tmp[0];
+
+		if (!extends.empty()) {
+			prepType.extends = extends;
+			tmpPrepType.type = extends;
+			file.prepTypes.push_back(tmpPrepType);
+		}
+
+		if (!implements.empty()) {
+			this->strings->split(prepType.implements, ",", implements);
+			for (string v : prepType.implements) {
+				tmpPrepType.type = v;
+				file.prepTypes.push_back(tmpPrepType);
+			}
+		}
+
+		//make first class in file having usages above
+		if (!i) {
+			file.firstMainTypeFull = mainTypeFull;
+		}
+
+		if ((className.compare(fileName) == 0 || mainType.compare(fileName) == 0)
+				&& found != string::npos) {
+			file.mainType = mainType;
+			file.firstMainTypeFull = mainTypeFull;
+		}
+
+		file.prepTypes.push_back(prepType);
+//		file.prepTypesMain.push_back(prepType);
+	}
+
+	if (file.mainType.empty()) {
+		for (PreparedType t : file.prepTypesMain) {
+			this->builtInTypes->insert(t.type);
+		}
+	}
+}
+
+ZendParser::File ZendParser::buildFile(DirectoryReader::Item* item,
+		vector<pair<string, string>>& out, vector<string>& tmpOut,
+		vector<string>& tmp) {
+	File file;
+	file.isValid = false;
 
 	if (!item->isFile) {
-		file.isValid = false;
 		return file;
 	}
 
-	Strings s;
 	file.name = item->name;
 	file.fullPath = item->fullPath;
-	file.content = this->reader->readTextFile(file.fullPath);
+	file.content = this->reader->readTextFile(item->fullPath);
+	file.mainTypes = new set<string>();
 
-	vector<string> mainType = extractMainType(file.content);
-	if (mainType.size() <= 0) {
-		file.isValid = false;
+	prepareTypesMain(file, tmpOut, tmp);
+
+	if (!file.isValid) {
+		file.isValid = true;
 		return file;
 	}
 
-	string mainTypeName = mainType[1];
-	if (!mainTypeName.empty()) {
-		file.mainType = mainTypeName;
-	} else {
-		file.isValid = false;
-		file.content.clear();
-		return file;
-	}
+	if (!file.mainType.empty())
+		extractNamespace(file.mainType, file.namespaceName, tmp);
 
-	copy(builtInTypes.begin(), builtInTypes.end(),
-			inserter(file.types, file.types.end()));
-
-	file.mainTypeFull = mainType[0];
-	file.namespaceName = extractNamespace(file.mainType);
-	file.types.push_back(file.mainType);
-
-	string extends = mainType[2];
-	if (!extends.empty()) {
-		file.types.push_back(extends);
-	}
-
-	string implements = mainType[3];
-	if (!implements.empty()) {
-		vector<string> implementsTypes = s.split(",", implements);
-		copy(implementsTypes.begin(), implementsTypes.end(),
-				inserter(file.types, file.types.end()));
-
-	}
-
-	vector<string> prepTypes = extractTypes(file.content);
-	file.types.insert(file.types.begin(), prepTypes.begin(), prepTypes.end());
-	file.types = filterTypes(file.types);
-	file.preparedTypes = generatePreparedTypes(file.types, file.mainType);
-
-//	file.content.clear();
+	prepareTypes(file, out, tmp);
 
 	return file;
-
 }
 
-const string ZendParser::extractNamespace(const string className) {
-	string out;
-	vector<string> tmp;
-	Strings s;
+void ZendParser::extractNamespace(const string& className, string& out,
+		vector<string>& tmp) {
+	tmp.clear();
+	out.clear();
 	unsigned int i = 0;
 
-	tmp = s.split("_", className);
+	strings->split(tmp, "_", className);
 
 	for (string& part : tmp) {
 		if (i + 1 < tmp.size()) {
@@ -221,17 +427,14 @@ const string ZendParser::extractNamespace(const string className) {
 		}
 		i++;
 	}
-
-	return out;
 }
 
-const string ZendParser::toNamespace(const string className) {
-	string out;
+void ZendParser::generateNamespace(const string& className, string& out) {
+	out.clear();
 	vector<string> tmp;
-	Strings s;
 	unsigned int i = 0;
 
-	tmp = s.split("_", className);
+	this->strings->split(tmp, "_", className);
 
 	for (string& part : tmp) {
 		out += part;
@@ -240,116 +443,255 @@ const string ZendParser::toNamespace(const string className) {
 		}
 		i++;
 	}
-
-	return out;
 }
 
-vector<string> ZendParser::filterTypes(vector<string> types) {
-	vector<string> typesFiltered;
-	for (string& type : types) {
-		boost::trim(type);
-		if (type.empty())
-			continue;
-		size_t found = type.find("_");
-		if (found != string::npos) {
-			if (type.compare("require_once") == 0
-					|| type.compare("require") == 0
-					|| type.compare("include_once") == 0
-					|| type.compare("include") == 0)
-				continue;
-			typesFiltered.push_back(type);
-		} else if (this->builtInTypes.find(type) != this->builtInTypes.end()) {
-			typesFiltered.push_back(type);
-		}
+void ZendParser::sortFaster(vector<PreparedType>& out) {
+	set<PreparedType> foos(out.begin(), out.end());
+	out.clear();
+	std::set<PreparedType>::reverse_iterator rit;
+	for (rit = foos.rbegin(); rit != foos.rend(); ++rit) {
+		out.push_back(*rit);
 	}
+}
 
-	sort(typesFiltered.begin(), typesFiltered.end());
-	typesFiltered.erase(unique(typesFiltered.begin(), typesFiltered.end()),
-			typesFiltered.end());
-
-	sort(typesFiltered.begin(), typesFiltered.end(),
-			[](const string& a, const string& b) -> bool
+void ZendParser::sortSlower(vector<PreparedType>& out) {
+	sort(out.begin(), out.end());
+	out.erase(unique(out.begin(), out.end()), out.end());
+	sort(out.begin(), out.end(),
+			[](const PreparedType& a, const PreparedType& b) -> bool
 			{
-				return a.size() > b.size();
+				return a.type.size() > b.type.size();
 			});
-
-	return typesFiltered;
 }
 
-vector<ZendParser::PreparedType> ZendParser::generatePreparedTypes(
-		vector<string>& types, string mainType) {
-	vector<PreparedType> out;
-	vector<vector<string>> tmp;
-	set<string> overlapping;
-	Strings s;
+void ZendParser::filterPreparedTypes(vector<PreparedType>& types,
+		vector<PreparedType>& out) {
+	out.clear();
+	size_t found;
+	string typeCopy;
+	set<string> duplicates;
+	for (PreparedType type : types) {
+		boost::trim(type.type);
+		if (type.type.empty())
+			continue;
+		typeCopy = type.type;
+		transform(typeCopy.begin(), typeCopy.end(), typeCopy.begin(),
+				::tolower);
+		found = typeCopy.find("_");
+		if (duplicates.find(typeCopy) != duplicates.end()
+				|| this->keywords->find(typeCopy) != this->keywords->end()
+				|| this->builtInTypes->find(type.type)
+						!= this->builtInTypes->end() || found == string::npos)
+			continue;
 
-	for (string& type : types) {
-		tmp.push_back(s.split("_", type));
+		out.push_back(type);
+		duplicates.insert(typeCopy);
 	}
 
-	for (vector<string>& type : tmp) {
-		string className = type[type.size() - 1];
+//	sortFaster(out);
+
+	sortSlower(out);
+}
+
+void ZendParser::generatePairs(vector<pair<string, string> >& out,
+		vector<string>& src) {
+	out.clear();
+	for (unsigned int i = 0; i < src.size(); i += 2) {
+		out.push_back(make_pair(src[i + 1], src[i]));
+	}
+}
+
+string ZendParser::generateAlias(vector<string>& type, unsigned int parts) {
+	if (type.size() <= 0)
+		return "";
+	if (type.size() == 1)
+		return type[0];
+
+	unsigned int limit = type.size() - 1;
+	unsigned int start = limit - (parts - 1);
+	string alias;
+
+	if (parts <= 0 || parts >= type.size())
+		start = 0;
+
+	while (start <= limit) {
+		alias += type[start];
+		start++;
+	}
+	return alias;
+}
+
+string ZendParser::generateAlias(string& type, unsigned int parts,
+		vector<string>& tmp) {
+	tmp.clear();
+
+	strings->split(tmp, "_", type);
+
+	return generateAlias(tmp, parts);
+}
+
+void ZendParser::generatePreparedTypes(File& file, vector<string>& tmp) {
+	tmp.clear();
+
+	set<string> overlapping;
+	stringstream stream;
+	string className, classNameLower, tmpString, tmpClassNameLower;
+//	PreparedType preparedType;
+	size_t size;
+
+	for (PreparedType type : file.prepTypes) {
+		className = generateAlias(type.type, 1, tmp);
+		classNameLower = className;
+		transform(classNameLower.begin(), classNameLower.end(),
+				classNameLower.begin(), ::tolower);
 		int count = 0;
-		for (vector<string>& type2 : tmp) {
-			string className2 = type2[type2.size() - 1];
-			if (className.compare(className2) == 0) {
+		for (PreparedType typeCompared : file.prepTypes) {
+			tmpString = generateAlias(typeCompared.type, 1, tmp);
+			tmpClassNameLower = tmpString;
+			transform(tmpClassNameLower.begin(), tmpClassNameLower.end(),
+					tmpClassNameLower.begin(), ::tolower);
+			if (classNameLower.compare(tmpClassNameLower) == 0) {
 				count++;
 			}
 		}
-
 		if (count > 1
-				|| this->builtInTypes.find(className)
-						!= this->builtInTypes.end()) {
+				|| this->builtInTypes->find(className)
+						!= this->builtInTypes->end()) {
 			overlapping.insert(className);
 		}
 	}
 
-	for (vector<string>& type : tmp) {
-		string className = type[type.size() - 1];
-		PreparedType preparedType;
-		stringstream stream;
-		copy(type.begin(), type.end(),
+	for (PreparedType& preparedType : file.prepTypes) {
+
+		strings->split(tmp, "_", preparedType.type);
+
+		className = tmp[tmp.size() - 1];
+
+		stream.str(string());
+		stream.clear();
+		copy(tmp.begin(), tmp.end(),
 				std::ostream_iterator<string>(stream, "_"));
 		preparedType.type = stream.str().substr(0, stream.str().length() - 1);
 
-		if (className.compare("Interface") == 0
-				|| className.compare("Abstract") == 0) {
-			stream.str(string());
-			stream.clear();
-			preparedType.alias = type[type.size() - 2] + type[type.size() - 1];
-			copy(type.begin(), type.end() - 1,
-					std::ostream_iterator<string>(stream, "_"));
-			preparedType.usage = toNamespace(
-					stream.str().substr(0, stream.str().length() - 1) + "_"
-							+ preparedType.alias);
-		} else if (overlapping.find(className) != overlapping.end()
-				&& preparedType.type.compare(mainType) != 0
-				&& this->builtInTypes.find(preparedType.type)
-						== this->builtInTypes.end()) {
-			preparedType.alias = type[type.size() - 2] + type[type.size() - 1];
-			preparedType.usage = toNamespace(preparedType.type);
-		} else if (this->builtInTypes.find(preparedType.type)
-				!= this->builtInTypes.end()) {
-			preparedType.alias = "\\" + preparedType.type;
+		tmpClassNameLower = className;
+		transform(tmpClassNameLower.begin(), tmpClassNameLower.end(),
+				tmpClassNameLower.begin(), ::tolower);
+
+		if (file.mainType.empty()) {
+			if (this->builtInTypes->find(preparedType.type)
+					!= this->builtInTypes->end()) {
+				preparedType.alias = "\\\\" + preparedType.type;
+			} else if (file.mainTypes->find(preparedType.type)
+					!= file.mainTypes->end()) {
+				preparedType.alias = preparedType.type;
+				builtInTypes->insert(preparedType.type);
+			} else if (this->keywords->find(tmpClassNameLower)
+					!= this->keywords->end()) {
+				string alias = generateAlias(tmp, 2);
+				stream.str(string());
+				stream.clear();
+				copy(tmp.begin(), tmp.end() - 1,
+						std::ostream_iterator<string>(stream, "_"));
+
+				generateNamespace(
+						stream.str().substr(0, stream.str().length() - 1) + "_"
+								+ alias, tmpString);
+
+				preparedType.alias = "\\" + tmpString;
+			} else {
+				generateNamespace(preparedType.type, preparedType.alias);
+				preparedType.alias = "\\" + preparedType.alias;
+//				cout <<preparedType.alias<<"\n";
+			}
 		} else {
-			preparedType.alias = type[type.size() - 1];
-			preparedType.usage = toNamespace(preparedType.type);
+			if (this->keywords->find(tmpClassNameLower) != this->keywords->end()
+					&& preparedType.type.compare(file.mainType) != 0) {
+				if (tmp.size() == 2) {
+					size = 2;
+				} else {
+					size = tmp.size() - 1;
+				}
+				preparedType.alias = generateAlias(tmp, size);
+				stream.str(string());
+				stream.clear();
+				copy(tmp.begin(), tmp.end() - 1,
+						std::ostream_iterator<string>(stream, "_"));
+				generateNamespace(
+						stream.str().substr(0, stream.str().length() - 1) + "_"
+								+ generateAlias(tmp, 2), preparedType.usage);
+
+			} else if (preparedType.type.compare(file.mainType) == 0) {
+				if (this->keywords->find(tmpClassNameLower)
+						!= this->keywords->end()) {
+					size = 2;
+				} else {
+					size = 1;
+				}
+				preparedType.alias = generateAlias(tmp, size);
+				preparedType.usage = "";
+			} else if (this->builtInTypes->find(preparedType.type)
+					!= this->builtInTypes->end()) {
+				preparedType.alias = "\\\\" + preparedType.type;
+				preparedType.usage = "";
+			} else if (overlapping.find(className) != overlapping.end()) {
+				if (tmp.size() == 2) {
+					size = 2;
+				} else {
+					size = tmp.size() - 1;
+				}
+				preparedType.alias = generateAlias(tmp, size);
+				generateNamespace(preparedType.type, preparedType.usage);
+			} else {
+				preparedType.alias = generateAlias(tmp, 1);
+				generateNamespace(preparedType.type, preparedType.usage);
+			}
 		}
-
-		out.push_back(preparedType);
-
 	}
-	return out;
+}
+
+void ZendParser::generatePreparedTypeFull(PreparedType& outPrep,
+		vector<string>& tmpVect) {
+	if (outPrep.type.find("_") == string::npos) {
+		outPrep.alias = "\\" + outPrep.type;
+		return;
+	}
+
+	stringstream stream;
+	string tmp;
+	size_t size = 1;
+
+	this->strings->split(tmpVect, "_", outPrep.type);
+
+	tmp = tmpVect[tmpVect.size() - 1];
+	transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
+
+	if (this->keywords->find(tmp) != this->keywords->end()) {
+		size = 2;
+	}
+
+	extractNamespace(outPrep.type, tmp, tmpVect);
+	tmp += "_" + generateAlias(outPrep.type, size, tmpVect);
+	generateNamespace(tmp, outPrep.alias);
+
+	outPrep.alias = "\\" + outPrep.alias;
+}
+
+void ZendParser::generatePreparedTypesGlobal(vector<string>& tmp) {
+	vector<PreparedType>::iterator type = typesRegistry->begin();
+	for (; type != typesRegistry->end(); ++type) {
+		generatePreparedTypeFull(*type, tmp);
+	}
 }
 
 void ZendParser::readBuiltInTypes() {
-	string rs = getReader()->readTextFile("builtintypes.txt");
-	vector<string> v = (new Strings())->split("\n", rs);
-	set<std::string> s(v.begin(), v.end());
-//	for (string t : s) {
-//		t = " " + t;
-//	}
-	this->builtInTypes = s;
+	vector<string> v;
+	strings->split(v, "\n", getReader()->readTextFile("builtInTypes.txt"));
+	this->builtInTypes = new set<std::string>(v.begin(), v.end());
+}
+void ZendParser::readKeywords() {
+	vector<string> v;
+	strings->split(v, "\n", getReader()->readTextFile("keywords.txt"));
+	this->keywords = new set<std::string>(v.begin(), v.end());
 }
 
 } /* namespace Salamon */
