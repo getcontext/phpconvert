@@ -46,14 +46,16 @@ void Regexer::findAll(vector<string>& out, const string& target,const string pat
 	end = target.end();
 	boost::match_results<std::string::const_iterator> what;
 	boost::match_flag_type flags = boost::match_default;
-
+	string result;
 	while (boost::regex_search(start, end, what, expression, flags)) {
 		if (index < 0) {
 			for (unsigned i = 0; i < what.size(); ++i) {
-				out.push_back((string) what[i]);
+				result = what[i];
+				out.push_back(result);
 			}
 		} else {
-			out.push_back((string) what[index]);
+			result = what[index];
+			out.push_back(result);
 		}
 		// update search position:
 		start = what[0].second;

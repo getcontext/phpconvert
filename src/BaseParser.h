@@ -26,6 +26,7 @@ class BaseParser {
 public:
 	struct PreparedType {
 		string type;
+		string typeLower;
 		string usage;
 		string alias;
 		string raw;
@@ -34,11 +35,11 @@ public:
 		string extends;
 		vector<string> implements;
 
-		bool operator == (PreparedType& obj) const {
-			return type.compare(obj.type) == 0 && raw.compare(obj.raw) == 0;
+		bool operator ==(PreparedType& compared) const {
+			return typeLower.compare(compared.typeLower) == 0;
 		}
-		bool operator < (PreparedType const& obj) const {
-			return type.size() > obj.type.size() && raw.size() > obj.raw.size();
+		bool operator <(PreparedType const& compared) const {
+			return typeLower.size() > compared.typeLower.size();
 		}
 	};
 

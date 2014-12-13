@@ -34,6 +34,8 @@ public:
 	static const string RGX_THROW_NEW;
 	static const char* RGX_BUILTIN_TYPE;
 
+	static const string RGX_EXCLUDE_COMMENT;
+
 	File buildFile(DirectoryReader::Item* item,
 			vector<pair<string, string> >& out, vector<string>& tmpOut,
 			vector<string>& tmp);
@@ -85,6 +87,8 @@ protected:
 			vector<string>& tmpVector);
 	void sortFaster(vector<PreparedType>& out);
 	void sortSlower(vector<PreparedType>& out);
+	void writeFiles(const set<string>& tmpSet, int& generated);
+	void replaceType(PreparedType& type, File& file);
 
 private:
 	DirectoryReader* reader;
