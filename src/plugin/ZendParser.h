@@ -15,6 +15,15 @@
 #include "../utils/Regexer.h"
 #include "../utils/Strings.h"
 
+///////////////////////////////////////////////////////////////////////////////
+//  Include Wave itself
+#include <boost/wave.hpp>
+
+///////////////////////////////////////////////////////////////////////////////
+// Include the lexer stuff
+#include <boost/wave/cpplexer/cpp_lex_token.hpp>    // token class
+#include <boost/wave/cpplexer/cpp_lex_iterator.hpp> // lexer class
+
 namespace Salamon {
 
 class ZendParser: public BaseParser {
@@ -89,6 +98,7 @@ protected:
 	void sortSlower(vector<PreparedType>& out);
 	void writeFiles(const set<string>& tmpSet, int& generated);
 	void replaceType(PreparedType& type, File& file);
+	string stripCmments(string const& input);
 
 private:
 	DirectoryReader* reader;

@@ -9,19 +9,14 @@
 
 namespace Salamon {
 
-const string ZendParser::RGX_INSTANCEOF =
-		"^(?!\\s*\\\\|/\\*|\\*)instanceof\\s+([A-Za-z0-9_]+)";
-const string ZendParser::RGX_NEW =
-		"^((?!\\s*\\\\|/\\*|\\*)([A-Za-z0-9\\$_= ]+new\\s+([A-Za-z0-9_]+)))";
-//const string ZendParser::RGX_NEW =
-//		"^((?!\\\\|/\\*|\\*).)(new\\s+([A-Za-z0-9_]+))";
-const string ZendParser::RGX_SIGNATURE =
-		"^(?!\\s*\\\\|/\\*|\\*)([A-Za-z0-9_]+)\\s+\\$[a-zA-Z0-9_]+";
-const string ZendParser::RGX_STATIC_CALL =
-		"^(?!\\s*\\\\|/\\*|\\*)([A-Za-z0-9_]+)::";
-const string ZendParser::RGX_MAIN_TYPE =
-		"^(?!\\s*\\\\|/\\*|\\*)(final|abstract)?[\\s\n]*(class|interface)[\\s\n]+([A-Za-z0-9_]+)[\\s\n]*(extends[\\s\n]+([A-Za-z0-9_]+)[\\s\n]*)?([\\s\n]*implements[\\s\n]+([A-Za-z0-9_ ,\\s\n]+))?[\\s\n]?\\{";
-const string ZendParser::RGX_THROW_NEW = "throw new\\s+([A-Za-z0-9_]+)";
+const string ZendParser::RGX_INSTANCEOF = "instanceof\\s+([A-Za-z0-9_]+)";
+const string ZendParser::RGX_NEW = "new\\s+([A-Za-z0-9_]+)";
+const string ZendParser::RGX_SIGNATURE = "([A-Za-z0-9_]+)\\s+\\$[a-zA-Z0-9_]+";
+const string ZendParser::RGX_STATIC_CALL = "([A-Za-z0-9_]+)::";
+const string ZendParser::RGX_MAIN_TYPE = "(\\s*(final|abstract)?"
+		"[\\s\n]*(class|interface)[\\s\n]+([A-Za-z0-9_]+)"
+		"[\\s\n]*(extends[\\s\n]+([A-Za-z0-9_]+)[\\s\n]*)?"
+		"([\\s\n]*implements[\\s\n]+([A-Za-z0-9_ ,\\s\n]+))?[\\s\n]?\\{)";
 
 const char* ZendParser::RGX_BUILTIN_TYPE =
 		"([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
@@ -29,7 +24,7 @@ const char* ZendParser::RGX_BUILTIN_TYPE =
 //const char* ZendParser::RGX_TYPE =
 //		"([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
 
-const string ZendParser::RGX_EXCLUDE_COMMENT = "^(?!\\s*\\\\|/\\*|\\*)\\s*";
+const string ZendParser::RGX_EXCLUDE_COMMENT = "^((?!\\s*\\\\|/\\*|\\*)";
 
 ZendParser::ZendParser() {
 	reader = new DirectoryReader();
@@ -85,16 +80,18 @@ void ZendParser::replaceTypesBuiltIn(File& file) {
 		this->strings->split(tmp, "_", builtInType);
 		className = tmp[tmp.size() - 1];
 
-		if ((className.compare(fileName) == 0
-				|| builtInType.compare(fileName) == 0)) {
-			continue;
-		}
+//		if (className.compare(builtInType) == 0
+//				|| builtInType.compare(fileName) == 0
+//				)
+//				 {
+//			continue;
+//		}
 
-		for (PreparedType val : file.prepTypes) {
-
-			if ((!val.isMain && val.type.compare(builtInType) != 0)
-					&& this->builtInTypes->find(builtInType)
-							!= this->builtInTypes->end()) {
+//		for (PreparedType val : file.prepTypes) {
+//
+//			if ((!val.isMain && val.type.compare(builtInType) != 0)
+//					&& this->builtInTypes->find(builtInType)
+//							!= this->builtInTypes->end()) {
 				sprintf(out, RGX_BUILTIN_TYPE, builtInType.c_str());
 				string regexSearch(out);
 				replaceFormat = "$1\\\\" + builtInType + "$3";
@@ -106,8 +103,8 @@ void ZendParser::replaceTypesBuiltIn(File& file) {
 				strings->regexReplace(file.content, regexSearch, replaceFormat);
 				strings->regexReplace(file.firstMainTypeFull, regexSearch,
 						replaceFormat);
-			}
-		}
+//			}
+//		}
 	}
 }
 
@@ -214,9 +211,9 @@ void ZendParser::buildFiles(File file, vector<string> tmpOut, int& processed,
 			continue;
 		}
 
-		if (it->name.compare("Select.php") != 0) {
-			continue;
-		}
+//		if (it->name.compare("Select.php") != 0) {
+//			continue;
+//		}
 
 		file = buildFile(&(*it), tmpOutPairs, tmpOut, tmpVector);
 		processed++;
@@ -254,20 +251,21 @@ void ZendParser::writeFiles(const set<string>& tmpSet, int& generated) {
 //		if (file->name.compare("Initializer.php")) {
 //			continue;
 //		}
-		if (file->name.compare("Select.php")) {
-			continue;
-		}
+//		if (file->name.compare("Select.php")) {
+//			continue;
+//		}
 		fileCopy = *file;
 		getReader()->createDir(outputDir + "\\" + file->rootPath);
-//		replaceTypesBuiltIn(fileCopy);
-
+		replaceTypesBuiltIn(fileCopy);
+//		cout << fileCopy.mainType << "\n";
 		if (fileCopy.mainType.length() > 0) {
+
 			addNamespace(fileCopy);
 			addUsages(fileCopy, tmpSet);
 			replaceTypes(fileCopy);
 		}
 
-//		replaceTypesGlobal(fileCopy);
+		replaceTypesGlobal(fileCopy);
 
 		getReader()->writeTextFile(
 				outputDir + "\\" + fileCopy.rootPath + fileCopy.name,
@@ -315,47 +313,48 @@ void ZendParser::parse() {
 void ZendParser::extractTypes(const string& line,
 		vector<pair<string, string>>& out, vector<string>& tmp) {
 	vector<string> tmpOut;
-	const char* source = line.c_str();
+	const string lineStripped = stripCmments(line);
 
-	regexer->findAll(tmp, source, RGX_NEW, -1);
+//	cout << "--NEW--" << "\n";
+	regexer->findAll(tmp, lineStripped, RGX_NEW, -1);
+//	for(string v:tmp) {
+//		cout << v << "\n";
+//	}
 	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
-	cout << "sizenew:" << tmp.size() << "\n";
-	for (string v : tmp) {
-		cout << v + "\n";
-	}
 
-//	regexer->findAll(tmp, source, RGX_INSTANCEOF, -1);
-//	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
-//
-//	regexer->findAll(tmp, source, RGX_SIGNATURE, -1);
-//	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
-//
-//	regexer->findAll(tmp, source, RGX_STATIC_CALL, -1);
-//	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
 
-//	regexer->findAll(tmp, source, RGX_THROW_NEW, -1);
-//	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
-//	cout << "sizethrownew:" << tmp.size() << "\n";
-//	for (string v : tmp) {
-//		cout << v + "\n";
-//	}
+	regexer->findAll(tmp, lineStripped, RGX_INSTANCEOF, -1);
+	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
 
-//	for(string v:tmpOut) {
-//		cout << v + "\n";
-//	}
+	regexer->findAll(tmp, lineStripped, RGX_STATIC_CALL, -1);
+	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
+
+	regexer->findAll(tmp, lineStripped, RGX_SIGNATURE, -1);
+	tmpOut.insert(tmpOut.begin(), tmp.begin(), tmp.end());
+
+
 	generatePairs(out, tmpOut);
-	tmpOut.clear();
-	tmp.clear();
+
+
+//	for(pair<string, string> v:out) {
+//		cout << v.second << "\n";
+//	}
+//	for(string v:tmpOut) {
+//		cout << v << "\n";
+//	}
 }
 
 void ZendParser::prepareTypes(File& file, vector<pair<string, string>>& out,
 		vector<string>& tmp) {
+//	cout << "file: " <<file.name << " ---------- \n";
 	extractTypes(file.content, out, tmp);
 	PreparedType prepType;
 	for (pair<string, string> pair : out) {
+
 		prepType.type = pair.first;
 		prepType.raw = pair.second;
 		prepType.replace = pair.second;
+//		cout << "first:" << pair.first << ",second:" << pair.second << "\n";
 		file.prepTypes.push_back(prepType);
 	}
 	vector<PreparedType> outPrep;
@@ -368,25 +367,27 @@ void ZendParser::extractMainType(File& file, vector<string>& out,
 		vector<string>& tmp) {
 	out.clear();
 	tmp.clear();
-	int step = 7;
+	int step = 9;
 	regexer->findAll(tmp, file.content.c_str(), RGX_MAIN_TYPE, -1);
 //	if (file.name.compare("Role.php") == 0) {
-//		for (string v : tmp) {
-//			cout << v + "=\n";
-//		}
 //		cout << "\n";
 //	}
+//	int i = 0;
+//	for (string v : tmp) {
+//		cout << i++ << ":" << v << "\n";
+//	}
+
 	size_t size = tmp.size();
 	if (size > 0) {
 		for (size_t i = 0; i < size - 1; i += step) {
 			out.push_back(tmp[0]);
-			out.push_back(tmp[3]); //class|interface
+			out.push_back(tmp[4]); //class|interface
 
-			out.push_back(tmp[4]);
-			out.push_back(tmp[5]); //extends
+			out.push_back(tmp[5]);
+			out.push_back(tmp[6]); //extends
 
-			out.push_back(tmp[6]);
-			out.push_back(tmp[7]); //implements
+			out.push_back(tmp[7]);
+			out.push_back(tmp[8]); //implements
 		}
 	}
 }
@@ -484,15 +485,15 @@ ZendParser::File ZendParser::buildFile(DirectoryReader::Item* item,
 	file.content = this->reader->readTextFile(item->fullPath);
 	file.mainTypes = new set<string>();
 
-//	prepareTypesMain(file, tmpOut, tmp);
-//
-//	if (!file.isValid) {
-//		file.isValid = true;
-//		return file;
-//	}
-//
-//	if (!file.mainType.empty())
-//		extractNamespace(file.mainType, file.namespaceName, tmp);
+	prepareTypesMain(file, tmpOut, tmp);
+
+	if (!file.isValid) {
+		file.isValid = true;
+		return file;
+	}
+
+	if (!file.mainType.empty())
+		extractNamespace(file.mainType, file.namespaceName, tmp);
 
 	prepareTypes(file, out, tmp);
 
@@ -789,5 +790,28 @@ void ZendParser::readKeywords() {
 	this->keywords = new set<std::string>(v.begin(), v.end());
 }
 
+std::string ZendParser::stripCmments(std::string const& input) {
+	std::string output;
+	typedef boost::wave::cpplexer::lex_token<> token_type;
+	typedef boost::wave::cpplexer::lex_iterator<token_type> lexer_type;
+	typedef token_type::position_type position_type;
+
+	position_type pos;
+
+	lexer_type it = lexer_type(input.begin(), input.end(), pos,
+			boost::wave::language_support(
+					boost::wave::support_cpp
+							| boost::wave::support_option_long_long));
+	lexer_type end = lexer_type();
+
+	for (; it != end; ++it) {
+		if (*it != boost::wave::T_CCOMMENT
+				&& *it != boost::wave::T_CPPCOMMENT) {
+			output += std::string(it->get_value().begin(),
+					it->get_value().end());
+		}
+	}
+	return output;
+}
 } /* namespace Salamon */
 

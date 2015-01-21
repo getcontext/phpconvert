@@ -38,7 +38,8 @@ string Regexer::find(const string& target, const string pattern, int index) {
 	return out;
 
 }
-void Regexer::findAll(vector<string>& out, const string& target,const string pattern, int index){
+void Regexer::findAll(vector<string>& out, const string& target,
+		const string pattern, int index) {
 	out.clear();
 	boost::regex expression(pattern);
 	std::string::const_iterator start, end;
@@ -63,6 +64,11 @@ void Regexer::findAll(vector<string>& out, const string& target,const string pat
 		flags |= boost::match_prev_avail;
 		flags |= boost::match_not_bob;
 	}
+
+//	for (string v : out) {
+//		cout << v << "\n";
+//	}
+
 }
 
 vector<string> Regexer::findAll(const string& target, const string pattern,
