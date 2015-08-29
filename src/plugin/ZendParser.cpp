@@ -789,7 +789,7 @@ void ZendParser::readKeywords() {
 	strings->split(v, "\n", getReader()->readTextFile("keywords.txt"));
 	this->keywords = new set<std::string>(v.begin(), v.end());
 }
-
+/** @todo refactor it with parsing comments. server......
 std::string ZendParser::stripCmments(std::string const& input) {
 	std::string output;
 	typedef boost::wave::cpplexer::lex_token<> token_type;
