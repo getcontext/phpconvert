@@ -29,6 +29,7 @@ const char* SystemException::what() const throw () {
 		msg << "Usage: zf2ns(.exe) <option(s)>\n";
 		msg << "Options:\n";
 		msg << "\t-d,\tSpecify the source directory\n";
+		msg << "\t-o,\tSpecify the output directory\n";
 		msg << "\t-r,\tProcess directories recursive";
 		break;
 	case CANT_OPEN_DIRECTORY:
