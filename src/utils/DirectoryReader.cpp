@@ -150,7 +150,7 @@ DirectoryReader::OS DirectoryReader::getOS() {
 
 bool DirectoryReader::writeTextFile(const string path, const string& content) {
 	ofstream myfile;
-	myfile.open(path);
+	myfile.open(path.c_str());
 	if (!myfile.is_open()) {
 		throw new std::invalid_argument("Can't write file :" + path);
 	}
