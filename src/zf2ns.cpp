@@ -37,6 +37,9 @@ int main(int argc, char* argv[]) {
 	} catch (exception& e) { //ooopss ;)
 		cout << e.what();
 	}
+	
+	delete appParams;
+	delete app;
 
 	b.setStop();
 	cout << b.getDiff() << "\n";
