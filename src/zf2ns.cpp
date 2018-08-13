@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
 	AppParams* appParams;
 	AppManager* app;
 	
-	appParams = (new AppParams())->createFromRequest(argc, argv);
+	appParams = (AppParams()).createFromRequest(argc, argv);
 	app = new AppManager();
 
 	try {
