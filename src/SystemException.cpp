@@ -43,7 +43,7 @@ const char* SystemException::what() const throw () {
 		break;
 	}
 	string str = msg.str();
-	const char* out = str.c_str();
+	const char* out = str.c_str(); //@todo seems to be pointer as well, make it field
 	return out;
 }
 
