@@ -208,7 +208,7 @@ void ZendParser::buildFiles(File file, vector<string> tmpOut, int& processed,
 		vector<pair<string, string> >& tmpOutPairs, vector<string>& tmpVector) {
 	for (vector<DirectoryReader::Item>::iterator it = readerResult->begin();
 			it != readerResult->end(); ++it) {
-		if (!it->isFile || it->name.find(".php") == string::npos) {
+		if (!it->isFile || it->name.find(".php") == string::npos) { //@todo find php3 and all possible native built in extensions
 			continue;
 		}
 
