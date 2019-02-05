@@ -58,7 +58,8 @@ void ZendParser::addNamespace(File& file) {
 	if (file.mainType.empty())
 		return;
 	string tmp = "<?php\n\nnamespace " + file.namespaceName + ";\n\n";
-	string rep = "<?php";
+	string rep = "<?php"; //@todo fix, make it array, add "<?" , it is also beginning of php files
+	//@commit extract isPhp() method
 	this->strings->replace(file.content, rep, tmp);
 }
 
