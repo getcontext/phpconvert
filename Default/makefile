@@ -40,13 +40,13 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: zf2ns
+all: phpconvert
 
 # Tool invocations
-zf2ns: $(OBJS) $(USER_OBJS)
+phpconvert: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	g++  -o "zf2ns" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++  -o "phpconvert" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
