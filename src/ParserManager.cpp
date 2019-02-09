@@ -9,28 +9,25 @@
 
 namespace phpconvert {
 
-ParserManager::ParserManager() {
-	// TODO Auto-generated constructor stub
+    ParserManager::ParserManager() {
+    }
 
-}
+    ParserManager::~ParserManager() {
+    }
 
-ParserManager::~ParserManager() {
-	// TODO Auto-generated destructor stub
-}
+    void ParserManager::setWorker(BaseParser *p) {
+        parser = p;
+    }
 
-void ParserManager::setWorker(BaseParser* p) {
-	parser = p;
-}
+    BaseParser *ParserManager::getParser() {
+        return parser;
+    }
 
-BaseParser* ParserManager::getParser() {
-	return parser;
-}
-
-void ParserManager::parse(AppParams* params) {
-	getParser()->setSourceDir(params->path);
-	getParser()->setRecursive(params->recursive);
-	getParser()->setOutputDir(params->outputPath);
-	getParser()->parse();
-}
+    void ParserManager::parse(AppParams *params) {
+        getParser()->setSourceDir(params->path);
+        getParser()->setRecursive(params->recursive);
+        getParser()->setOutputDir(params->outputPath);
+        getParser()->parse();
+    }
 
 } /* namespace phpconvert */

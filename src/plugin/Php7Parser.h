@@ -10,9 +10,10 @@
 #endif //PHPCONVERT_PHP7PARSER_H
 namespace phpconvert {
 
-    class Php7Parser: public ZendParser {
+    class Php7Parser : public ZendParser {
     public:
         Php7Parser();
+
         virtual ~Php7Parser();
     };
 }

@@ -9,28 +9,28 @@
 
 namespace phpconvert {
 
-BaseParser::BaseParser() {
-	setRecursive(false);
-}
+    BaseParser::BaseParser() {
+        setRecursive(false);
+    }
 
-BaseParser::~BaseParser() {
-}
+    BaseParser::~BaseParser() {
+    }
 
-void BaseParser::setSourceDir(const string p) {
-	sourceDir = p;
-}
+    void BaseParser::setSourceDir(const string p) {
+        sourceDir = p;
+    }
 
-void BaseParser::setOutputDir(const string p) {
-	outputDir = p;
-}
+    void BaseParser::setOutputDir(const string p) {
+        outputDir = p;
+    }
 
-void BaseParser::setRecursive(bool val) {
-	recursive = val;
-}
+    void BaseParser::setRecursive(bool val) {
+        recursive = val;
+    }
 
-bool BaseParser::isRecurisve() {
-	return recursive;
-}
+    bool BaseParser::isRecurisve() {
+        return recursive;
+    }
 
 } /* namespace phpconvert */
 

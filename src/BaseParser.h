@@ -22,55 +22,63 @@ using namespace std;
 
 namespace phpconvert {
 
-class BaseParser {
-public:
-	struct PreparedType {
-		string type;
-		string typeLower;
-		string usage;
-		string alias;
-		string raw;
-		string replace;
-		bool isMain = false;
-		string extends;
-		vector<string> implements;
+    class BaseParser {
+    public:
+        struct PreparedType {
+            string type;
+            string typeLower;
+            string usage;
+            string alias;
+            string raw;
+            string replace;
+            bool isMain = false;
+            string extends;
+            vector<string> implements;
 
-		bool operator ==(PreparedType& compared) const {
-			return typeLower.compare(compared.typeLower) == 0;
-		}
-		bool operator <(PreparedType const& compared) const {
-			return typeLower.size() > compared.typeLower.size();
-		}
-	};
+            bool operator==(PreparedType &compared) const {
+                return typeLower.compare(compared.typeLower) == 0;
+            }
 
-	struct File {
-		string name;
-		string fullPath;
-		string rootPath;
-		string namespaceName;
-		bool isValid;
-		string mainType;
-		string firstMainTypeFull;
-		string content;
+            bool operator<(PreparedType const &compared) const {
+                return typeLower.size() > compared.typeLower.size();
+            }
+        };
 
-		set<string>* mainTypes;
-		vector<string> types;
-		vector<PreparedType> prepTypes;
-		vector<PreparedType> prepTypesMain;
-	};
+        struct File {
+            string name;
+            string fullPath;
+            string rootPath;
+            string namespaceName;
+            bool isValid;
+            string mainType;
+            string firstMainTypeFull;
+            string content;
 
-	BaseParser();
-	virtual ~BaseParser();
-	virtual void parse() = 0;
-	void setSourceDir(const string path);
-	void setOutputDir(const string path);
-	void setRecursive(const bool val);
-	bool isRecurisve();
-protected:
-	string sourceDir;
-	string outputDir;
-	bool recursive;
-};
+            set<string> *mainTypes;
+            vector<string> types;
+            vector<PreparedType> prepTypes;
+            vector<PreparedType> prepTypesMain;
+        };
+
+        BaseParser();
+
+        virtual ~BaseParser();
+
+        virtual void parse() = 0;
+
+        void setSourceDir(const string path);
+
+        void setOutputDir(const string path);
+
+        void setRecursive(const bool val);
+
+        bool isRecurisve();
+
+    protected:
+        string sourceDir;
+        string outputDir;
+        bool recursive;
+    };
 
 } /* namespace phpconvert */
 

@@ -21,28 +21,28 @@
 using namespace std;
 using namespace phpconvert;
 
-int main(int argc, char* argv[]) {
-	Bench b;
-	b.setStart();
-		
-	AppParams* appParams;
-	AppManager* app;
-	
-	appParams = (AppParams()).createFromRequest(argc, argv);
-	app = new AppManager();
+int main(int argc, char *argv[]) {
+    Bench b;
+    b.setStart();
 
-	try {
-		app->run(appParams);
-	} catch (SystemException& e) {
-		cout << e.what();
-	} catch (exception& e) { //ooopss ;)
-		cout << e.what();
-	}
+    AppParams *appParams;
+    AppManager *app;
 
-	delete appParams;
-	delete app;
+    appParams = (AppParams()).createFromRequest(argc, argv);
+    app = new AppManager();
 
-	b.setStop();
-	cout << b.getDiff() << "\n";
-	return 0;
+    try {
+        app->run(appParams);
+    } catch (SystemException &e) {
+        cout << e.what();
+    } catch (exception &e) { //ooopss ;)
+        cout << e.what();
+    }
+
+    delete appParams;
+    delete app;
+
+    b.setStop();
+    cout << b.getDiff() << "\n";
+    return 0;
 }

@@ -10,24 +10,28 @@
 #define APPPARAMS_H_
 
 #include <string>
+
 using namespace std;
 
 namespace phpconvert {
 
-class AppParams {
-public:
-	string path;
-	bool recursive;
-	string outputPath;
-	AppParams* createFromRequest(int argc,char* argv[]);
-	bool isValid();
-private:
-	bool valid;
-	void setRecursive(const bool recursive);
-	void setValid(const bool valid);
+    class AppParams {
+    public:
+        string path;
+        bool recursive;
+        string outputPath;
 
+        AppParams *createFromRequest(int argc, char *argv[]);
 
-};
+        bool isValid();
+
+    private:
+        bool valid;
+
+        void setRecursive(const bool recursive);
+
+        void setValid(const bool valid);
+    };
 
 } /* namespace phpconvert */
 

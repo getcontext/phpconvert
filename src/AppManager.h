@@ -7,19 +7,23 @@
 
 #ifndef APPMANAGER_H_
 #define APPMANAGER_H_
+
 #include "ParserManager.h"
 #include "AppParams.h"
 
 namespace phpconvert {
 
-class AppManager {
-public:
-	AppManager();
-	virtual ~AppManager();
-	void run(AppParams* params);
-protected:
-	ParserManager *parser;
-};
+    class AppManager {
+    public:
+        AppManager();
+
+        virtual ~AppManager();
+
+        void run(AppParams *params);
+
+    protected:
+        ParserManager *parser;
+    };
 
 } /* namespace phpconvert */
 

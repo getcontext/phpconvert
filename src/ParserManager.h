@@ -7,6 +7,7 @@
 
 #ifndef PARSERMANAGER_H_
 #define PARSERMANAGER_H_
+
 #include <string>
 #include "BaseParser.h"
 #include "AppParams.h"
@@ -15,16 +16,21 @@ using namespace std;
 
 namespace phpconvert {
 
-class ParserManager {
-public:
-	ParserManager();
-	virtual ~ParserManager();
-	void setWorker(BaseParser *p);
-	BaseParser *getParser();
-	void parse(AppParams* params);
-protected:
-	BaseParser *parser;
-};
+    class ParserManager {
+    public:
+        ParserManager();
+
+        virtual ~ParserManager();
+
+        void setWorker(BaseParser *p);
+
+        BaseParser *getParser();
+
+        void parse(AppParams *params);
+
+    protected:
+        BaseParser *parser;
+    };
 
 } /* namespace phpconvert */
 
