@@ -2,7 +2,7 @@
  * SystemException.h
  *
  *  Created on: 18 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 
 #ifndef SYSTEMEXCEPTION_H_
@@ -10,7 +10,7 @@
 #include <exception>
 using namespace std;
 
-namespace Salamon {
+namespace phpconvert {
 
 class SystemException: public exception {
 public:
@@ -29,6 +29,6 @@ public:
 	ExType getCode();
 };
 
-} /* namespace Salamon */
+} /* namespace phpconvert */
 
 #endif /* SYSTEMEXCEPTION_H_ */

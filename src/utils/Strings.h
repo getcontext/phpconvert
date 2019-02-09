@@ -15,7 +15,7 @@
 using namespace std;
 using namespace boost;
 
-namespace Salamon {
+namespace phpconvert {
 
 class Strings {
 public:
@@ -28,6 +28,6 @@ public:
 	void regexReplace(string* target, string& from, string& to);
 };
 
-} /* namespace Salamon */
+} /* namespace phpconvert */
 
 #endif /* STRINGS_H_ */

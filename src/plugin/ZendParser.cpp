@@ -2,12 +2,12 @@
  * PhpParser.cpp
  *
  *  Created on: 3 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 
 #include "ZendParser.h"
 
-namespace Salamon {
+namespace phpconvert {
 
 const string ZendParser::RGX_INSTANCEOF = "instanceof\\s+([A-Za-z0-9_]+)";
 const string ZendParser::RGX_NEW = "new\\s+([A-Za-z0-9_]+)";
@@ -790,7 +790,10 @@ void ZendParser::readKeywords() {
 	strings->split(v, "\n", getReader()->readTextFile("keywords.txt"));
 	this->keywords = new set<std::string>(v.begin(), v.end());
 }
-/** @todo refactor it with parsing comments. server......
+/**
+ * @todo refactor it with parsing comments. server......
+ *
+ */
 std::string ZendParser::stripCmments(std::string const& input) {
 	std::string output;
 	typedef boost::wave::cpplexer::lex_token<> token_type;

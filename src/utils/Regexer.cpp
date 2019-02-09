@@ -12,7 +12,7 @@
 
 using namespace std;
 
-namespace Salamon {
+namespace phpconvert {
 
 Regexer::Regexer() {
 	// TODO Auto-generated constructor stub
@@ -119,5 +119,5 @@ void Regexer::test(string target, string pattern) {
 	}
 }
 
-} /* namespace Salamon */
+} /* namespace phpconvert */
 

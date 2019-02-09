@@ -3,7 +3,7 @@
  * AppParams.h
  *
  *  Created on: 17 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 
 #ifndef APPPARAMS_H_
@@ -12,7 +12,7 @@
 #include <string>
 using namespace std;
 
-namespace Salamon {
+namespace phpconvert {
 
 class AppParams {
 public:
@@ -29,6 +29,6 @@ private:
 
 };
 
-} /* namespace Salamon */
+} /* namespace phpconvert */
 
 #endif /* APPPARAMS_H_ */

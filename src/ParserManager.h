@@ -2,7 +2,7 @@
  * ParserManager.h
  *
  *  Created on: 3 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 
 #ifndef PARSERMANAGER_H_
@@ -13,7 +13,7 @@
 
 using namespace std;
 
-namespace Salamon {
+namespace phpconvert {
 
 class ParserManager {
 public:
@@ -26,6 +26,6 @@ protected:
 	BaseParser *parser;
 };
 
-} /* namespace Salamon */
+} /* namespace phpconvert */
 
 #endif /* PARSERMANAGER_H_ */

@@ -4,7 +4,7 @@
  * parses and extracs zend1 shit
  *
  *  Created on: 3 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 
 #ifndef ZENDPARSER_H_
@@ -24,7 +24,7 @@
 #include <boost/wave/cpplexer/cpp_lex_token.hpp>    // token class
 #include <boost/wave/cpplexer/cpp_lex_iterator.hpp> // lexer class
 
-namespace Salamon {
+namespace phpconvert {
 
 class ZendParser: public BaseParser {
 public:
@@ -114,6 +114,6 @@ private:
 	vector<File>* results;
 };
 
-} /* namespace Salamon */
+} /* namespace phpconvert */
 
 #endif /* ZENDPARSER_H_ */

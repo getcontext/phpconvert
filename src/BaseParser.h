@@ -2,7 +2,7 @@
  * Parser.h
  *
  *  Created on: 3 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 
 #ifndef BASEPARSER_H_
@@ -20,7 +20,7 @@
 
 using namespace std;
 
-namespace Salamon {
+namespace phpconvert {
 
 class BaseParser {
 public:
@@ -72,6 +72,6 @@ protected:
 	bool recursive;
 };
 
-} /* namespace Salamon */
+} /* namespace phpconvert */
 
 #endif /* BASEPARSER_H_ */

@@ -2,7 +2,7 @@
  * AppManager.h
  *
  *  Created on: 12 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 
 #ifndef APPMANAGER_H_
@@ -10,7 +10,7 @@
 #include "ParserManager.h"
 #include "AppParams.h"
 
-namespace Salamon {
+namespace phpconvert {
 
 class AppManager {
 public:
@@ -21,6 +21,6 @@ protected:
 	ParserManager *parser;
 };
 
-} /* namespace Salamon */
+} /* namespace phpconvert */
 
 #endif /* APPMANAGER_H_ */

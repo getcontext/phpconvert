@@ -14,7 +14,7 @@
 
 using namespace std;
 
-namespace Salamon {
+namespace phpconvert {
 
 class Regexer {
 public:
@@ -26,6 +26,6 @@ public:
 	void test(string target, string pattern);
 };
 
-} /* namespace Salamon */
+} /* namespace phpconvert */
 
 #endif /* REGEXER_H_ */

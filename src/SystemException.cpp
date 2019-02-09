@@ -2,7 +2,7 @@
  * SystemException.cpp
  *
  *  Created on: 18 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 
 #include "SystemException.h"
@@ -11,7 +11,7 @@
 using namespace std;
 
 
-namespace Salamon {
+namespace phpconvert {
 
 SystemException::SystemException(SystemException::ExType t) {
 	code = t;
@@ -50,5 +50,5 @@ const char* SystemException::what() const throw () {
 SystemException::ExType SystemException::getCode() {
 	return code;
 }
-} /* namespace Salamon */
+} /* namespace phpconvert */
 

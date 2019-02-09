@@ -7,6 +7,6 @@
 
 #include "Regexer.h"
 
-namespace Salamon {
+namespace phpconvert {
 
-} /* namespace Salamon */
+} /* namespace phpconvert */

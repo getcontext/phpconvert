@@ -2,12 +2,12 @@
  * AppParams.cpp
  *
  *  Created on: 17 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 
 #include "AppParams.h"
 
-namespace Salamon {
+namespace phpconvert {
 
 AppParams* AppParams::createFromRequest(int argc, char* argv[]) {
 	string current;
@@ -45,4 +45,4 @@ void AppParams::setValid(const bool valid) {
 	this->valid = valid;
 }
 
-} /* namespace Salamon */
+} /* namespace phpconvert */

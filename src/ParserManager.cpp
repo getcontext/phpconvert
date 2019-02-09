@@ -2,12 +2,12 @@
  * ParserManager.cpp
  *
  *  Created on: 3 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 
 #include "ParserManager.h"
 
-namespace Salamon {
+namespace phpconvert {
 
 ParserManager::ParserManager() {
 	// TODO Auto-generated constructor stub
@@ -33,4 +33,4 @@ void ParserManager::parse(AppParams* params) {
 	getParser()->parse();
 }
 
-} /* namespace Salamon */
+} /* namespace phpconvert */

@@ -7,7 +7,7 @@
 
 #include "Strings.h"
 
-namespace Salamon {
+namespace phpconvert {
 
 Strings::Strings() {
 	// TODO Auto-generated constructor stub
@@ -39,4 +39,4 @@ void Strings::regexReplace(string& target, string& from, string& to) {
 			boost::match_default | boost::format_all);
 }
 
-} /* namespace Salamon */
+} /* namespace phpconvert */

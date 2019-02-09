@@ -15,7 +15,7 @@
 
 using namespace std;
 
-namespace Salamon {
+namespace phpconvert {
 class Bench {
 public:
 	Bench();
@@ -34,6 +34,6 @@ private:
 	static const double ZERO_TIME;
 };
 
-} /* namespace Salamon */
+} /* namespace phpconvert */
 
 #endif /* BENCH_H_ */

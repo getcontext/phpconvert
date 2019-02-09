@@ -1,9 +1,10 @@
 //============================================================================
-// Name        : zf2ns.cpp
-// Author      : Andrzej Salamon <andrzej.salamon@gmail.com>
+// Name        : phpconvert
+// Author      : Andrzej phpconvert <andrzej.salamon@gmail.com>
 // Version     :
-// Copyright   : Copyright by Andrzej Salamon <andrzej.salamon@gmail.com>
-// Description : Hello World in C++, Ansi-style
+// Copyright   : Copyright by Andrzej phpconvert <andrzej.salamon@gmail.com>
+// Description : php converter, old php 5 to new php 5 with namespaces and usages,
+//               new php code is being generated after processing old one
 //============================================================================
 
 #include <iostream>
@@ -18,7 +19,7 @@
 #include <boost/regex.hpp>
 
 using namespace std;
-using namespace Salamon;
+using namespace phpconvert;
 
 int main(int argc, char* argv[]) {
 	Bench b;
@@ -37,7 +38,7 @@ int main(int argc, char* argv[]) {
 	} catch (exception& e) { //ooopss ;)
 		cout << e.what();
 	}
-	
+
 	delete appParams;
 	delete app;
 

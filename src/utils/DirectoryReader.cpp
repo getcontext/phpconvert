@@ -2,12 +2,12 @@
  * DirectoryReader.cpp
  *
  *  Created on: 24 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 #include "DirectoryReader.h"
 #include <iostream>
 
-namespace Salamon {
+namespace phpconvert {
 
 /*
  * windows based systems directory separator
@@ -181,4 +181,4 @@ void DirectoryReader::removeDir(const string path) {
 
 }
 
-/* namespace Salamon */
+/* namespace phpconvert */

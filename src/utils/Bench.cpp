@@ -7,7 +7,7 @@
 
 #include "Bench.h"
 
-namespace Salamon {
+namespace phpconvert {
 
 Bench::Bench() {
 	start = ZERO_TIME;
@@ -41,4 +41,4 @@ string Bench::getDiff() {
 	return string(out);
 }
 
-} /* namespace Salamon */
+} /* namespace phpconvert */

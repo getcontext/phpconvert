@@ -2,17 +2,17 @@
  * AppManager.cpp
  *
  *  Created on: 12 May 2014
- *      Author: Andrzej Salamon <andrzej.salamon@gmail.com>
+ *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
  */
 
 #include "AppManager.h"
 #include "plugin/ZendParser.h"
 #include "SystemException.h"
 
-namespace Salamon {
+namespace phpconvert {
 
 AppManager::AppManager() {
-	ParserManager* parserObj = new ParserManager();
+	ParserManager *parserObj = new ParserManager();
 	parser = parserObj;
 }
 
@@ -20,14 +20,14 @@ AppManager::~AppManager() {
 	// TODO Auto-generated destructor stub
 }
 
-void AppManager::run(AppParams* params) {
+void AppManager::run(AppParams *params) {
 	if(!params->isValid()) {
 		throw SystemException(SystemException::INVALID_PARAMETERS);
 	}
-	ZendParser* worker = new ZendParser();
-	BaseParser* w = worker;
+	ZendParser *worker = new ZendParser(); //@todo detect plugin
+	BaseParser *w = worker;
 	parser->setWorker(w);
 	parser->parse(params);
 }
 
-} /* namespace Salamon */
+} /* namespace phpconvert */
