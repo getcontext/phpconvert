@@ -44,7 +44,9 @@ namespace phpconvert {
         static const string RGX_STATIC_CALL;
         static const string RGX_MAIN_TYPE;
         static const string RGX_THROW_NEW;
-        static const char *RGX_BUILTIN_TYPE;
+        static const string RGX_PHP_OPENING_TAG;
+        //@todo detect if it is script or (class/interface or more of them)
+        static const string RGX_BUILTIN_TYPE;
 
         static const string RGX_EXCLUDE_COMMENT;
 
@@ -123,13 +125,10 @@ namespace phpconvert {
         DirectoryReader *reader;
         Regexer *regexer;
         Strings *strings;
-
         set<string> *builtInTypes;
         set<string> *keywords;
-
         vector<PreparedType> *typesRegistry;
         vector<PreparedType> *typesRegistryUnfiltered;
-
         vector<File> *results;
     };
 

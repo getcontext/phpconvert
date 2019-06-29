@@ -18,8 +18,10 @@ namespace phpconvert {
                                              "[\\s\n]*(extends[\\s\n]+([A-Za-z0-9_]+)[\\s\n]*)?"
                                              "([\\s\n]*implements[\\s\n]+([A-Za-z0-9_ ,\\s\n]+))?[\\s\n]?\\{)";
 
-    const char *ZendParser::RGX_BUILTIN_TYPE =
+    const string ZendParser::RGX_BUILTIN_TYPE =
             "([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
+
+    const string ZendParser::RGX_PHP_OPENING_TAG = "^(<\\?|<\\?php)";
 
 //const char* ZendParser::RGX_TYPE =
 //		"([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
@@ -29,10 +31,11 @@ namespace phpconvert {
     ZendParser::ZendParser() {
         reader = new DirectoryReader();
         strings = new Strings();
-
         results = new vector<File>();
         typesRegistry = new vector<PreparedType>();
         typesRegistryUnfiltered = new vector<PreparedType>();
+        vectorString = new vector<string>();
+        setString =  new set<string>();
 
         readBuiltInTypes();
         readKeywords();
@@ -44,6 +47,8 @@ namespace phpconvert {
         delete results;
         delete typesRegistry;
         delete typesRegistryUnfiltered;
+        delete vectorString;
+        delete setString;
     }
 
     DirectoryReader *ZendParser::getReader() {
@@ -57,7 +62,7 @@ namespace phpconvert {
     void ZendParser::addNamespace(File &file) {
         if (file.mainType.empty())
             return;
-        string tmp = "<?php\n\nnamespace " + file.namespaceName + ";\n\n";
+        string tmp = "(<?|<?php)\n\nnamespace " + file.namespaceName + ";\n\n";
         string rep = "<?php"; //@todo fix, make it array, add "<?" , it is also beginning of php files
         //@commit extract isPhp() method
         this->strings->replace(file.content, rep, tmp);
@@ -263,7 +268,7 @@ namespace phpconvert {
             if (fileCopy.mainType.length() > 0) {
 
                 addNamespace(fileCopy);
-                addUsages(fileCopy, tmpSet);
+                addUsages(fileCopy, *setString);
                 replaceTypes(fileCopy);
             }
 
@@ -290,8 +295,8 @@ namespace phpconvert {
         vector<DirectoryReader::Item> *readerResult = reader->getResults();
 
         int generated = 0, processed = 0;
-        vector<string> tmpOut, tmpVector;
-        set<string> tmpSet;
+        vector<string> tmpOut, tmpVector/*unused now, moved to class*/;
+        set<string> tmpSet/*unused now, moved to class*/;
         vector<pair<string, string>> tmpOutPairs;
         File file;
 
@@ -397,7 +402,7 @@ namespace phpconvert {
     void ZendParser::prepareTypesMain(File &file, vector<string> &out,
                                       vector<string> &tmp) {
         out.clear();
-        tmp.clear();
+        vectorString->clear();
 
         file.isValid = false;
 
@@ -428,10 +433,10 @@ namespace phpconvert {
             prepType.raw = mainTypeFull;
             prepType.replace = mainTypeFull;
 
-            this->strings->split(tmp, "_", mainType);
-            className = tmp[tmp.size() - 1];
+            this->strings->split(*vectorString, "_", mainType);
+            className = (*vectorString)[vectorString->size() - 1];
 
-            this->strings->split(tmp, ".", file.name);
+            this->strings->split(*vectorString, ".", file.name);
             fileName = tmp[0];
 
             if (!extends.empty()) {
@@ -749,6 +754,8 @@ namespace phpconvert {
 
     void ZendParser::generatePreparedTypeFull(PreparedType &outPrep,
                                               vector<string> &tmpVect) {
+        vectorString->clear();
+
         if (outPrep.type.find("_") == string::npos) {
             outPrep.alias = "\\" + outPrep.type;
             return;
@@ -758,26 +765,28 @@ namespace phpconvert {
         string tmp;
         size_t size = 1;
 
-        this->strings->split(tmpVect, "_", outPrep.type);
+        this->strings->split(*vectorString, "_", outPrep.type);
 
-        tmp = tmpVect[tmpVect.size() - 1];
+        tmp = (*vectorString)[vectorString->size() - 1];
         transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
 
         if (this->keywords->find(tmp) != this->keywords->end()) {
             size = 2;
         }
 
-        extractNamespace(outPrep.type, tmp, tmpVect);
-        tmp += "_" + generateAlias(outPrep.type, size, tmpVect);
+        extractNamespace(outPrep.type, tmp, *vectorString);
+        tmp += "_" + generateAlias(outPrep.type, size, *vectorString);
         generateNamespace(tmp, outPrep.alias);
 
         outPrep.alias = "\\" + outPrep.alias;
     }
 
     void ZendParser::generatePreparedTypesGlobal(vector<string> &tmp) {
+        vectorString->clear();
+
         vector<PreparedType>::iterator type = typesRegistry->begin();
         for (; type != typesRegistry->end(); ++type) {
-            generatePreparedTypeFull(*type, tmp);
+            generatePreparedTypeFull(*type, *vectorString);
         }
     }
 

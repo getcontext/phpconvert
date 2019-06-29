@@ -61,6 +61,7 @@ protected:
 private:
 	vector<Item> *result;
 
+	string getFullPath(const string &rootPath, const string &name, const string &separator) const;
 };
 
 } /* namespace phpconvert */

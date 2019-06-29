@@ -25,6 +25,7 @@ namespace phpconvert {
     class BaseParser {
     public:
         struct PreparedType {
+            string id; //@todo new introduced field, fully qualified namespace with c/i name
             string type;
             string typeLower;
             string usage;
@@ -78,6 +79,9 @@ namespace phpconvert {
         string sourceDir;
         string outputDir;
         bool recursive;
+        //utility vector
+        vector<string> *vectorString;
+        set<string> *setString;
     };
 
 } /* namespace phpconvert */

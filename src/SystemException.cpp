@@ -13,7 +13,7 @@ using namespace std;
 
 namespace phpconvert {
 
-    SystemException::SystemException(SystemException::ExType t) {
+    SystemException::SystemException(SystemException::ExceptionType t) {
         code = t;
     }
 
@@ -47,7 +47,7 @@ namespace phpconvert {
         return out;
     }
 
-    SystemException::ExType SystemException::getCode() {
+    SystemException::ExceptionType SystemException::getCode() {
         return code;
     }
 } /* namespace phpconvert */

@@ -12,172 +12,181 @@ namespace phpconvert {
 /*
  * windows based systems directory separator
  */
-const string DirectoryReader::WIN_DS = "\\";
+    const string DirectoryReader::WIN_DS = "\\";
 /*
  * unix/linux based systems directory separator
  */
-const string DirectoryReader::NIX_DS = "/";
+    const string DirectoryReader::NIX_DS = "/";
 
-void DirectoryReader::read() {
-	DIR *dir;
-	dirent *ent;
-	string rootPath(path);
+    void DirectoryReader::read() {
+        DIR *dir;
+        dirent *ent;
+        string rootPath(path);
 
-	if ((dir = opendir(path)) == NULL) {
-		throw SystemException(SystemException::CANT_OPEN_DIRECTORY);
-	}
+        if ((dir = opendir(path)) == NULL) {
+            throw SystemException(SystemException::CANT_OPEN_DIRECTORY);
+        }
 
-	while ((ent = readdir(dir)) != NULL) {
-		string name(ent->d_name);
+        while ((ent = readdir(dir)) != NULL) {
+            string name(ent->d_name);
 
-		if (name == "." || name == "..")
-			continue;
+            if (name == "." || name == "..")
+                continue;
 
-		OS os = getOS();
-		string separator;
+            OS os = getOS();
+            string separator;
 
-		if (os == DirectoryReader::Win) {
-			separator = DirectoryReader::NIX_DS;
-		} else if (os == DirectoryReader::Nix) {
-			separator = DirectoryReader::NIX_DS;
-		}
+            if (os == DirectoryReader::Win) {
+                separator = DirectoryReader::NIX_DS;
+            } else if (os == DirectoryReader::Nix) {
+                separator = DirectoryReader::NIX_DS;
+            }
 
-		string fullPath = rootPath + separator + name;
+            string fullPath = getFullPath(rootPath, name, separator);
 
-		struct stat st;
-		stat(fullPath.c_str(), &st);
+            struct stat st;
+            stat(fullPath.c_str(), &st);
 
-		Item item;
-		item.isFile = S_ISDIR(st.st_mode) ? false : true;
-		item.name = name;
-		item.fullPath = fullPath;
+            Item item; //can I return reference of local and catch it to external pointer ? when ref to fn Item creation block
+            item.isFile = S_ISDIR(st.st_mode) ? false : true;
+            item.name = name;
+            item.fullPath = fullPath;
 
-		result->push_back(item);
-	}
-	closedir(dir);
-}
+            result->push_back(item);
+        }
+        closedir(dir);
+    }
 
-void DirectoryReader::read(const char* dirName, string baseDir) {
-	DIR *dir;
-	dirent *ent;
+    string DirectoryReader::getFullPath(const string &rootPath, const string &name, const string &separator) const {
+        string fullPath = rootPath;
+        fullPath += separator;
+        fullPath += name;
+        return fullPath;
+    }
 
-	if ((dir = opendir(dirName)) == NULL) {
-		throw SystemException(SystemException::CANT_OPEN_DIRECTORY);
-	}
+    void DirectoryReader::read(const char *dirName, string baseDir) {
+        DIR *dir;
+        dirent *ent;
 
-	while ((ent = readdir(dir)) != NULL) {
-		string fileName(ent->d_name);
-		if (fileName.compare(".") == 0 || fileName.compare("..") == 0)
-			continue;
+        if ((dir = opendir(dirName)) == NULL) {
+            throw SystemException(SystemException::CANT_OPEN_DIRECTORY);
+        }
 
-		OS os = getOS();
-		string separator;
+        while ((ent = readdir(dir)) != NULL) {
+            string fileName(ent->d_name);
+            if (fileName.compare(".") == 0 || fileName.compare("..") == 0)
+                continue;
 
-		if (os == DirectoryReader::Win) {
-			separator = DirectoryReader::NIX_DS;
-		} else if (os == DirectoryReader::Nix) {
-			separator = DirectoryReader::NIX_DS;
-		}
+            OS os = getOS();
+            string separator;
 
-		string fullPath = dirName + separator + fileName;
+            if (os == DirectoryReader::Win) {
+                separator = DirectoryReader::NIX_DS;
+            } else if (os == DirectoryReader::Nix) {
+                separator = DirectoryReader::NIX_DS;
+            }
 
-		struct stat st;
-		stat(fullPath.c_str(), &st);
+            string fullPath = getFullPath(dirName, fileName, separator);
 
-		Item item;
-		item.isFile = S_ISDIR(st.st_mode) ? false : true;
-		item.name = fileName;
-		item.fullPath = fullPath;
-		item.dir = baseDir;
+            struct stat st;
+            stat(fullPath.c_str(), &st);
 
-		result->push_back(item);
+            Item item;
+            item.isFile = S_ISDIR(st.st_mode) ? false : true;
+            item.name = fileName;
+            item.fullPath = fullPath;
+            item.dir = baseDir;
 
-		if (!item.isFile) {
-			this->read(fullPath.c_str(), baseDir + fileName + separator);
-		}
-	}
+            result->push_back(item);
 
-	closedir(dir);
-}
+            if (!item.isFile) {
+                this->read(fullPath.c_str(), getFullPath(baseDir, fileName, separator));
+            }
+        }
 
-DirectoryReader::DirectoryReader() {
-	result = new vector<DirectoryReader::Item>();
-}
+        closedir(dir);
+    }
 
-DirectoryReader::DirectoryReader(const char* dir) :
-		path(dir) {
-	result = new vector<DirectoryReader::Item>();
-}
+    DirectoryReader::DirectoryReader() {
+        result = new vector<DirectoryReader::Item>();
+    }
 
-DirectoryReader::~DirectoryReader() {
-}
+    DirectoryReader::DirectoryReader(const char *dir) :
+            path(dir) {
+        result = new vector<DirectoryReader::Item>();
+    }
 
-vector<DirectoryReader::Item> *DirectoryReader::getResults() {
-	return result;
-}
+    DirectoryReader::~DirectoryReader() {
+    }
 
-void DirectoryReader::setPath(const char* p) {
-	path = p;
-}
-const char* DirectoryReader::getPath() {
-	return path;
-}
+    vector<DirectoryReader::Item> *DirectoryReader::getResults() {
+        return result;
+    }
 
-DirectoryReader::OS DirectoryReader::getOS() {
+    void DirectoryReader::setPath(const char *p) {
+        path = p;
+    }
+
+    const char *DirectoryReader::getPath() {
+        return path;
+    }
+
+    DirectoryReader::OS DirectoryReader::getOS() {
 #ifdef _WIN32
-	const char* a = "win";
+        const char *OS_NAME = "win";
 #elif _WIN64
-	const char* a = "win";
+        const char *OS_NAME = "win";
 #elif __unix
-	const char* a = "nix";
+        const char *OS_NAME = "nix";
 #elif __linux
-	const char* a = "nix";
+        const char *OS_NAME= "nix";
 #endif
 
-	DirectoryReader::OS os;
-	string osname(a);
+        DirectoryReader::OS os;
+        string operatingSystemName(OS_NAME);
 
-	if (osname == "win") {
-		os = DirectoryReader::Win;
-	} else if (osname == "nix") {
-		os = DirectoryReader::Nix;
-	} else {
-		throw new SystemException(SystemException::OS_NOT_FOUND);
-	}
+        if (operatingSystemName == "win") {
+            os = DirectoryReader::Win;
+        } else if (operatingSystemName == "nix") {
+            os = DirectoryReader::Nix;
+        } else {
+            throw new SystemException(SystemException::OS_NOT_FOUND);
+        }
 
-	return os;
-}
+        return os;
+    }
 
-bool DirectoryReader::writeTextFile(const string path, const string& content) {
-	ofstream myfile;
-	myfile.open(path.c_str());
-	if (!myfile.is_open()) {
-		throw new std::invalid_argument("Can't write file :" + path);
-	}
-	myfile << content;
-	myfile.close();
-	return myfile.is_open();
-}
+    bool DirectoryReader::writeTextFile(const string path, const string &content) {
+        ofstream myfile;
+        myfile.open(path.c_str());
+        if (!myfile.is_open()) {
+            throw std::invalid_argument("Can't write file :" + path);
+        }
+        myfile << content;
+        myfile.close();
+        return myfile.is_open();
+    }
 
-string DirectoryReader::readTextFile(const string path) {
-	string line;
-	string out;
-	ifstream myfile(path.c_str());
-	if (myfile.is_open()) {
-		while (getline(myfile, line)) {
-			out += line + "\n";
-		}
-	}
-	myfile.close();
-	return out;
-}
-void DirectoryReader::createDir(const string path) {
-	boost::filesystem::create_directories(path);
-}
+    string DirectoryReader::readTextFile(const string path) {
+        string line;
+        string out;
+        ifstream myfile(path.c_str());
+        if (myfile.is_open()) {
+            while (getline(myfile, line)) {
+                out += line + "\n";
+            }
+        }
+        myfile.close();
+        return out;
+    }
 
-void DirectoryReader::removeDir(const string path) {
-	boost::filesystem::remove_all(path);
-}
+    void DirectoryReader::createDir(const string path) {
+        boost::filesystem::create_directories(path);
+    }
+
+    void DirectoryReader::removeDir(const string path) {
+        boost::filesystem::remove_all(path);
+    }
 
 }
 

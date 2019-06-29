@@ -16,22 +16,22 @@ namespace phpconvert {
 
     class SystemException : public exception {
     public:
-        enum ExType {
+        enum ExceptionType {
             INVALID_PARAMETERS,
             CANT_OPEN_DIRECTORY,
             OS_NOT_FOUND,
             FATAL
         };
     private:
-        ExType code;
+        ExceptionType code;
     public:
-        SystemException(ExType t);
+        SystemException(ExceptionType t);
 
         virtual ~SystemException() throw();
 
         const char *what() const throw();
 
-        ExType getCode();
+        ExceptionType getCode();
     };
 
 } /* namespace phpconvert */
