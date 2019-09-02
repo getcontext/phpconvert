@@ -45,4 +45,16 @@ namespace phpconvert {
         this->valid = valid;
     }
 
+    const string &AppParams::getPath() const {
+        return path;
+    }
+
+    bool AppParams::isRecursive() const {
+        return recursive;
+    }
+
+    const string &AppParams::getOutputPath() const {
+        return outputPath;
+    }
+
 } /* namespace phpconvert */
