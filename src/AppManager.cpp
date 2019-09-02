@@ -17,6 +17,7 @@ namespace phpconvert {
     }
 
     AppManager::~AppManager() {
+        delete parser;
     }
 
     void AppManager::run(AppParams *params) {

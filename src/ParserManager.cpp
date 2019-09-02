@@ -13,6 +13,7 @@ namespace phpconvert {
     }
 
     ParserManager::~ParserManager() {
+        delete parser;
     }
 
     void ParserManager::setWorker(BaseParser *p) {
