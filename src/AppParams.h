@@ -17,15 +17,21 @@ namespace phpconvert {
 
     class AppParams {
     public:
-        string path;
-        bool recursive;
-        string outputPath;
-
         AppParams *createFromRequest(int argc, char *argv[]);
 
         bool isValid();
 
+        const string &getPath() const;
+
+        bool isRecursive() const;
+
+        const string &getOutputPath() const;
+
     private:
+        //@todo add private constructor, avoid copy constructor
+        string path;
+        bool recursive;
+        string outputPath;
         bool valid;
 
         void setRecursive(const bool recursive);
