@@ -25,9 +25,10 @@ namespace phpconvert {
     }
 
     void ParserManager::parse(AppParams *params) {
-        getParser()->setSourceDir(params->path);
-        getParser()->setRecursive(params->recursive);
-        getParser()->setOutputDir(params->outputPath);
+        //give parser whole *params
+        getParser()->setSourceDir(params->getPath());
+        getParser()->setRecursive(params->isRecursive());
+        getParser()->setOutputDir(params->getOutputPath());
         getParser()->parse();
     }
 

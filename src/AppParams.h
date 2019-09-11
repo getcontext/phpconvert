@@ -19,11 +19,15 @@ namespace phpconvert {
     public:
         AppParams *createFromRequest(int argc, char *argv[]);
 
-        bool isValid();
+        const bool &isValid();
 
         const string &getPath() const;
 
-        bool isRecursive() const;
+        const bool &isRecursive() const;
+
+        void setPath(const string &path);
+
+        void setOutputPath(const string &outputPath);
 
         const string &getOutputPath() const;
 
