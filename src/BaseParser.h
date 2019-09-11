@@ -63,7 +63,7 @@ namespace phpconvert {
 
         BaseParser();
 
-        virtual ~BaseParser();
+        virtual ~BaseParser() = 0;
 
         virtual void parse() = 0;
 
