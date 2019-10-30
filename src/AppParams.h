@@ -17,7 +17,7 @@ namespace phpconvert {
 
     class AppParams {
     public:
-        AppParams *createFromRequest(int argc, char *argv[]);
+        static AppParams *createFromRequest(int argc, char *argv[]);
 
         const bool &isValid();
 
