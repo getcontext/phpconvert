@@ -9,24 +9,24 @@
 
 namespace phpconvert {
 
-    const string ZendParser::RGX_INSTANCEOF = "instanceof\\s+([A-Za-z0-9_]+)";
-    const string ZendParser::RGX_NEW = "new\\s+([A-Za-z0-9_]+)";
-    const string ZendParser::RGX_SIGNATURE = "([A-Za-z0-9_]+)\\s+\\$[a-zA-Z0-9_]+";
-    const string ZendParser::RGX_STATIC_CALL = "([A-Za-z0-9_]+)::";
-    const string ZendParser::RGX_MAIN_TYPE = "(\\s*(final|abstract)?"
-                                             "[\\s\n]*(class|interface)[\\s\n]+([A-Za-z0-9_]+)"
-                                             "[\\s\n]*(extends[\\s\n]+([A-Za-z0-9_]+)[\\s\n]*)?"
-                                             "([\\s\n]*implements[\\s\n]+([A-Za-z0-9_ ,\\s\n]+))?[\\s\n]?\\{)";
+    const char *ZendParser::RGX_INSTANCEOF = "instanceof\\s+([A-Za-z0-9_]+)";
+    const char *ZendParser::RGX_NEW = "new\\s+([A-Za-z0-9_]+)";
+    const char *ZendParser::RGX_SIGNATURE = "([A-Za-z0-9_]+)\\s+\\$[a-zA-Z0-9_]+";
+    const char *ZendParser::RGX_STATIC_CALL = "([A-Za-z0-9_]+)::";
+    const char *ZendParser::RGX_MAIN_TYPE = "(\\s*(final|abstract)?"
+                                            "[\\s\n]*(class|interface)[\\s\n]+([A-Za-z0-9_]+)"
+                                            "[\\s\n]*(extends[\\s\n]+([A-Za-z0-9_]+)[\\s\n]*)?"
+                                            "([\\s\n]*implements[\\s\n]+([A-Za-z0-9_ ,\\s\n]+))?[\\s\n]?\\{)";
 
-    const string ZendParser::RGX_BUILTIN_TYPE =
+    const char *ZendParser::RGX_BUILTIN_TYPE =
             "([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
 
-    const string ZendParser::RGX_PHP_OPENING_TAG = "^(<\\?|<\\?php)";
+    const char *ZendParser::RGX_PHP_OPENING_TAG = "^(<\\?|<\\?php)";
 
-//const char* ZendParser::RGX_TYPE =
-//		"([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
+    const char *ZendParser::RGX_TYPE =
+            "([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
 
-    const string ZendParser::RGX_EXCLUDE_COMMENT = "^((?!\\s*\\\\|/\\*|\\*)";
+    const char* ZendParser::RGX_EXCLUDE_COMMENT = "^((?!\\s*\\\\|/\\*|\\*)";
 
     ZendParser::ZendParser() {
         reader = new DirectoryReader();
@@ -35,7 +35,7 @@ namespace phpconvert {
         typesRegistry = new vector<PreparedType>();
         typesRegistryUnfiltered = new vector<PreparedType>();
         vectorString = new vector<string>();
-        setString =  new set<string>();
+        setString = new set<string>();
 
         readBuiltInTypes();
         readKeywords();
@@ -809,7 +809,7 @@ namespace phpconvert {
     std::string ZendParser::stripCmments(std::string const &input) {
         std::string output;
         typedef boost::wave::cpplexer::lex_token<> token_type;
-        typedef boost::wave::cpplexer::lex_iterator <token_type> lexer_type;
+        typedef boost::wave::cpplexer::lex_iterator<token_type> lexer_type;
         typedef token_type::position_type position_type;
 
         position_type pos;

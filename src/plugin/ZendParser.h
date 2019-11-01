@@ -38,17 +38,17 @@ namespace phpconvert {
 
         Regexer *getRegexer();
 
-        static const string RGX_INSTANCEOF;
-        static const string RGX_NEW;
-        static const string RGX_SIGNATURE;
-        static const string RGX_STATIC_CALL;
-        static const string RGX_MAIN_TYPE;
-        static const string RGX_THROW_NEW;
-        static const string RGX_PHP_OPENING_TAG;
+        static const char* RGX_INSTANCEOF;
+        static const char* RGX_NEW;
+        static const char* RGX_SIGNATURE;
+        static const char* RGX_STATIC_CALL;
+        static const char* RGX_MAIN_TYPE;
+        static const char* RGX_THROW_NEW;
+        static const char* RGX_PHP_OPENING_TAG;
         //@todo detect if it is script or (class/interface or more of them)
-        static const string RGX_BUILTIN_TYPE;
-
-        static const string RGX_EXCLUDE_COMMENT;
+        static const char* RGX_BUILTIN_TYPE;
+        static const char* RGX_TYPE;
+        static const char* RGX_EXCLUDE_COMMENT;
 
         File buildFile(DirectoryReader::Item *item,
                        vector<pair<string, string> > &out, vector<string> &tmpOut,
