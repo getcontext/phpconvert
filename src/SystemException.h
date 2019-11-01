@@ -8,6 +8,7 @@
 #ifndef SYSTEMEXCEPTION_H_
 #define SYSTEMEXCEPTION_H_
 
+#include <string>
 #include <exception>
 
 using namespace std;
@@ -22,16 +23,21 @@ namespace phpconvert {
             OS_NOT_FOUND,
             FATAL
         };
-    private:
-        ExceptionType code;
-    public:
-        SystemException(ExceptionType t);
 
-        virtual ~SystemException() throw();
+        SystemException(ExceptionType t) throw();
 
-        const char *what() const throw();
+        virtual ~SystemException();
+
+        virtual const char *what() const throw();
 
         ExceptionType getCode();
+
+        void setMessage(string &message);
+
+    private:
+        ExceptionType code;
+        const char* charMessage;
+        string message;
     };
 
 } /* namespace phpconvert */

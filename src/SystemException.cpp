@@ -13,14 +13,9 @@ using namespace std;
 
 namespace phpconvert {
 
-    SystemException::SystemException(SystemException::ExceptionType t) {
+    SystemException::SystemException(SystemException::ExceptionType t) throw() {
         code = t;
-    }
 
-    SystemException::~SystemException() throw() {
-    }
-
-    const char *SystemException::what() const throw() {
         stringstream msg;
 
         switch (code) {
@@ -42,13 +37,23 @@ namespace phpconvert {
                 msg << "Unknonw error";
                 break;
         }
-        string str = msg.str();
-        const char *out = str.c_str(); //@todo seems to be pointer as well, make it field
-        return out;
+
+        message = msg.str();
+    }
+
+    SystemException::~SystemException() throw() {
+    }
+
+    const char *SystemException::what() const throw() {
+        return message.c_str();
     }
 
     SystemException::ExceptionType SystemException::getCode() {
         return code;
+    }
+
+    void SystemException::setMessage(string &message) {
+        this->message = message;
     }
 } /* namespace phpconvert */
 
