@@ -2,7 +2,7 @@
 // Name        : phpconvert
 // Author      : Andrzej phpconvert <andrzej.salamon@gmail.com>
 // Version     :
-// Copyright   : Copyright by Andrzej phpconvert <andrzej.salamon@gmail.com>
+// Copyright   : Copyright by   andrzej.salamon@gmail.com
 // Description : php converter, old php 5 to new php 5 with namespaces and usages,
 //               new php code is being generated after processing old one
 //============================================================================
