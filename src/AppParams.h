@@ -31,16 +31,16 @@ namespace phpconvert {
 
         const string &getOutputPath() const;
 
+        void setRecursive(const bool &recursive);
+
+        void setValid(const bool &valid);
+
     private:
         //@todo add private constructor, avoid copy constructor
         string path;
         bool recursive;
         string outputPath;
         bool valid;
-
-        void setRecursive(const bool recursive);
-
-        void setValid(const bool valid);
     };
 
 } /* namespace phpconvert */

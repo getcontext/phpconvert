@@ -33,11 +33,11 @@ namespace phpconvert {
         return obj;
     }
 
-    void AppParams::setRecursive(const bool recursive) {
+    void AppParams::setRecursive(const bool &recursive) {
         this->recursive = recursive;
     }
 
-    void AppParams::setValid(const bool valid) {
+    void AppParams::setValid(const bool &valid) {
         this->valid = valid;
     }
 
@@ -59,12 +59,10 @@ namespace phpconvert {
 
     //yeah autogeneration partially correct...  will blow when explictly passed. must be copyy :D
     void AppParams::setPath(const string &path) {
-        AppParams::path = path;
         this->path = path;
     }
 
     void AppParams::setOutputPath(const string &outputPath) {
-//        AppParams::outputPath = outputPath;
         this->outputPath = outputPath;
     }
 
