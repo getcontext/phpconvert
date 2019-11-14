@@ -8,7 +8,7 @@ namespace phpconvert {
         return id;
     }
 
-    void setId(const string &id) {
+    void PreparedType::setId(const string &id) {
         PreparedType::id = id;
     }
 
@@ -16,7 +16,7 @@ namespace phpconvert {
         return type;
     }
 
-    void setType(const string &type) {
+    void PreparedType::setType(const string &type) {
         PreparedType::type = type;
     }
 
@@ -24,7 +24,7 @@ namespace phpconvert {
         return typeLower;
     }
 
-    void setTypeLower(const string &typeLower) {
+    void PreparedType::setTypeLower(const string &typeLower) {
         PreparedType::typeLower = typeLower;
     }
 
@@ -32,7 +32,7 @@ namespace phpconvert {
         return usage;
     }
 
-    void setUsage(const string &usage) {
+    void PreparedType::setUsage(const string &usage) {
         PreparedType::usage = usage;
     }
 
@@ -40,7 +40,7 @@ namespace phpconvert {
         return alias;
     }
 
-    void setAlias(const string &alias) {
+    void PreparedType::setAlias(const string &alias) {
         PreparedType::alias = alias;
     }
 
@@ -48,7 +48,7 @@ namespace phpconvert {
         return raw;
     }
 
-    void setRaw(const string &raw) {
+    void PreparedType::setRaw(const string &raw) {
         PreparedType::raw = raw;
     }
 
@@ -56,15 +56,15 @@ namespace phpconvert {
         return replace;
     }
 
-    void setReplace(const string &replace) {
+    void PreparedType::setReplace(const string &replace) {
         PreparedType::replace = replace;
     }
 
-    bool isMain1() const {
+    bool PreparedType::isMain1() const {
         return isMain;
     }
 
-    void setIsMain(bool isMain) {
+    void PreparedType::setIsMain(bool isMain) {
         PreparedType::isMain = isMain;
     }
 

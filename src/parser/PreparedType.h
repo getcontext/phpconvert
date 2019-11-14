@@ -79,7 +79,6 @@ namespace phpconvert {
         bool isMain = false;
         string extends;
         vector<string> implements;
-
     };
 }
 
