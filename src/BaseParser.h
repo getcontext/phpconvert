@@ -17,6 +17,8 @@
 #include <vector>
 #include <set>
 #include <exception>
+#include "parser/PreparedType.h"
+#include "parser/File.h"
 
 using namespace std;
 
@@ -24,7 +26,7 @@ namespace phpconvert {
 
     class BaseParser {
     public:
-        struct PreparedType {
+        struct PreparedType  { //@todo extract it to separate class
             string id; //@todo new introduced field, fully qualified namespace with c/i name
             string type;
             string typeLower;

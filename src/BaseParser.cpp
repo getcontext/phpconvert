@@ -31,6 +31,5 @@ namespace phpconvert {
     bool BaseParser::isRecurisve() {
         return recursive;
     }
-
 } /* namespace phpconvert */
 

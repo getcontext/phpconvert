@@ -21,8 +21,13 @@ namespace phpconvert {
 
         void run(AppParams *params);
 
+        AppParams *getParams() const;
+
+        void setParams(AppParams *params);
+
     protected:
         ParserManager *parser;
+        AppParams *params;
     };
 
 } /* namespace phpconvert */
