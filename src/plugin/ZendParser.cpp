@@ -40,7 +40,7 @@ namespace phpconvert {
         readBuiltInTypes();
         readKeywords();
     }
-
+//@todo iterator
     ZendParser::~ZendParser() {
         delete reader;
         delete strings;
@@ -808,7 +808,7 @@ namespace phpconvert {
  */
     std::string ZendParser::stripCmments(std::string const &input) {
         std::string output;
-        typedef boost::wave::cpplexer::lex_token<> token_type; // ???? no typedef wtf
+        typedef boost::wave::cpplexer::lex_token<> token_type; //@todo ???? no typedef wtf
         typedef boost::wave::cpplexer::lex_iterator<token_type> lexer_type;
         typedef token_type::position_type position_type;
 
