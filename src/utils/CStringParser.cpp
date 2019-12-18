@@ -3,3 +3,12 @@
 //
 
 #include "CStringParser.h"
+
+CStringParser::CStringParser(const char *source) : source(source) {
+
+}
+
+
+const char *CStringParser::findBetween(char start, char stop) {
+    return nullptr;
+}
