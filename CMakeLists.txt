@@ -18,8 +18,8 @@ find_package(Boost 1.66.0 REQUIRED COMPONENTS thread system filesystem regex wav
 link_directories(${Boost_LIBRARY_DIR})
 
 
-
-add_executable(phpconvert
+add_executable(
+        phpconvert
         src/plugin/Php7Parser.cpp
         src/plugin/ZendParser.cpp
         src/plugin/ZendParser.h
@@ -49,6 +49,10 @@ add_executable(phpconvert
         src/phpconvert.cpp
         src/SystemException.cpp
         src/SystemException.h
-        src/SystemException_test.cpp src/plugin/Php7Parser.h src/utils/CStringParser.cpp src/utils/CStringParser.h)
+        src/SystemException_test.cpp
+        src/plugin/Php7Parser.h
+        src/utils/CStringParser.cpp
+        src/utils/CStringParser.h
+)
 
 target_link_libraries(phpconvert boost_thread boost_system boost_filesystem boost_regex boost_wave)
