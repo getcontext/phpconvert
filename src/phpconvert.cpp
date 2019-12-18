@@ -16,7 +16,7 @@
 
 #include "utils/Bench.h"
 
-#include <boost/regex.hpp>
+//#include <boost/regex.hpp>
 
 using namespace std;
 using namespace phpconvert;
@@ -25,21 +25,21 @@ int main(int argc, char *argv[]) {
     Bench b;
     b.setStart();
 
-    AppParams *appParams;
+//    AppParams *appParams;
     AppManager *app;
 
-    appParams = AppParams::createFromRequest(argc, argv);
+//    appParams = AppParams::createFromRequest(argc, argv);
     app = new AppManager();
 
     try {
-        app->run(appParams);
+        app->run(AppParams::createFromRequest(argc, argv));
     } catch (SystemException &e) {
         cout << e.what();
     } catch (exception &e) { //ooopss ;)
         cout << e.what();
     }
 
-    delete appParams;
+//    delete appParams;
     delete app;
 
     b.setStop();
