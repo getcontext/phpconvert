@@ -2,7 +2,7 @@
  * DirectoryReader.h
  *
  *  Created on: 24 May 2014
- *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
+ *      Author: Andrzej S <andrzej.salamon@gmail.com>
  */
 
 #ifndef DIRECTORYREADER_H_
@@ -57,10 +57,9 @@ public:
 	 */
 	static const string NIX_DS;
 protected:
-	const char* path;
 private:
+    const char* path;
 	vector<Item> *result;
-
 	string getFullPath(const string &rootPath, const string &name, const string &separator) const;
 };
 

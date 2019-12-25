@@ -12,9 +12,9 @@
 namespace phpconvert {
 
     AppManager::AppManager() {
-//        ParserManager *parserObj = new ParserManager();
-//        parser = parserObj;
-        parser = new ParserManager()
+        ParserManager *parserObj = new ParserManager();
+        parser = parserObj;
+//        parser = new ParserManager()
     }
 
     AppManager::~AppManager() {

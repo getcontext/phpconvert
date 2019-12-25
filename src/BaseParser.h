@@ -2,7 +2,7 @@
  * Parser.h
  *
  *  Created on: 3 May 2014
- *      Author: Andrzej phpconvert <andrzej.salamon@gmail.com>
+ *      Author: Andrzej S <andrzej.salamon@gmail.com>
  */
 
 #ifndef BASEPARSER_H_

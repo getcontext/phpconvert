@@ -139,7 +139,7 @@ namespace phpconvert {
 #elif __unix
         const char *OS_NAME = "nix";
 #elif __linux
-        const char *OS_NAME= "nix";
+        const char *OS_NAME = "nix";
 #endif
 
         DirectoryReader::OS os;

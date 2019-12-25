@@ -802,8 +802,10 @@ namespace phpconvert {
         this->keywords = new set<std::string>(v.begin(), v.end());
     }
 
-/**
+/**d
  * @todo refactor it with parsing comments. server......
+ *
+ * @todo make it all c-string while parser , bit fck high versions but can do
  *
  */
     std::string ZendParser::stripCmments(std::string const &input) {

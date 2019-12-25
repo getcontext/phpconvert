@@ -51,8 +51,8 @@ add_executable(
         src/SystemException.h
         src/SystemException_test.cpp
         src/plugin/Php7Parser.h
-        src/utils/CStringParser.cpp
-        src/utils/CStringParser.h
+        src/utils/CString.cpp
+        src/utils/CString.h
 )
 
 target_link_libraries(phpconvert boost_thread boost_system boost_filesystem boost_regex boost_wave)
