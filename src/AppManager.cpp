@@ -29,7 +29,7 @@ namespace phpconvert {
         }
 
         ZendParser *worker = new ZendParser(); //@todo detect plugin
-        BaseParser *w = worker;  //not sure about downcasting... could be factory
+        Parser *w = worker;  //not sure about downcasting... could be factory
 
         parser->setWorker(w);
         parser->parse(getParams());

@@ -10,7 +10,7 @@
 #ifndef ZENDPARSER_H_
 #define ZENDPARSER_H_
 
-#include "../BaseParser.h"
+#include "Parser.h"
 #include "../utils/DirectoryReader.h"
 #include "../utils/Regexer.h"
 #include "../utils/Strings.h"
@@ -26,7 +26,7 @@
 
 namespace phpconvert {
 
-    class ZendParser : public BaseParser {
+    class ZendParser : public Parser {
     public:
         ZendParser();
 
@@ -37,18 +37,6 @@ namespace phpconvert {
         DirectoryReader *getReader();
 
         Regexer *getRegexer();
-
-        static const char* RGX_INSTANCEOF;
-        static const char* RGX_NEW;
-        static const char* RGX_SIGNATURE;
-        static const char* RGX_STATIC_CALL;
-        static const char* RGX_MAIN_TYPE;
-        static const char* RGX_THROW_NEW;
-        static const char* RGX_PHP_OPENING_TAG;
-        //@todo detect if it is script or (class/interface or more of them)
-        static const char* RGX_BUILTIN_TYPE;
-        static const char* RGX_TYPE;
-        static const char* RGX_EXCLUDE_COMMENT;
 
         File buildFile(DirectoryReader::Item *item,
                        vector<pair<string, string> > &out, vector<string> &tmpOut,
@@ -66,12 +54,12 @@ namespace phpconvert {
 
         void extractMainType(File &file, vector<string> &out, vector<string> &tmp);
 
-        void filterPreparedTypes(vector<PreparedType> &types,
-                                 vector<PreparedType> &out);
+        void filterPreparedTypes(vector<parser::PreparedType> &types,
+                                 vector<parser::PreparedType> &out);
 
         void generatePairs(vector<pair<string, string> > &out, vector<string> &src);
 
-        void generatePreparedTypeFull(PreparedType &outPrep,
+        void generatePreparedTypeFull(parser::PreparedType &outPrep,
                                       vector<string> &tmpVect);
 
         void generatePreparedTypes(File &file, vector<string> &tmp);
@@ -111,13 +99,13 @@ namespace phpconvert {
                         vector<pair<string, string> > &tmpOutPairs,
                         vector<string> &tmpVector);
 
-        void sortFaster(vector<PreparedType> &out);
+        void sortFaster(vector<parser::PreparedType> &out);
 
-        void sortSlower(vector<PreparedType> &out);
+        void sortSlower(vector<parser::PreparedType> &out);
 
         void writeFiles(const set<string> &tmpSet, int &generated);
 
-        void replaceType(PreparedType &type, File &file);
+        void replaceType(parser::PreparedType &type, File &file);
 
         string stripCmments(string const &input);
 
@@ -127,8 +115,8 @@ namespace phpconvert {
         Strings *strings;
         set<string> *builtInTypes;
         set<string> *keywords;
-        vector<PreparedType> *typesRegistry;
-        vector<PreparedType> *typesRegistryUnfiltered;
+        vector<parser::PreparedType> *typesRegistry;
+        vector<parser::PreparedType> *typesRegistryUnfiltered;
         vector<File> *results;
     };
 

@@ -6,34 +6,18 @@
  */
 
 #include "ZendParser.h"
+#include "Parser.h"
+#include "parser/PreparedType.h"
+#include "parser/File.h"
 
 namespace phpconvert {
-
-    const char *ZendParser::RGX_INSTANCEOF = "instanceof\\s+([A-Za-z0-9_]+)";
-    const char *ZendParser::RGX_NEW = "new\\s+([A-Za-z0-9_]+)";
-    const char *ZendParser::RGX_SIGNATURE = "([A-Za-z0-9_]+)\\s+\\$[a-zA-Z0-9_]+";
-    const char *ZendParser::RGX_STATIC_CALL = "([A-Za-z0-9_]+)::";
-    const char *ZendParser::RGX_MAIN_TYPE = "(\\s*(final|abstract)?"
-                                            "[\\s\n]*(class|interface)[\\s\n]+([A-Za-z0-9_]+)"
-                                            "[\\s\n]*(extends[\\s\n]+([A-Za-z0-9_]+)[\\s\n]*)?"
-                                            "([\\s\n]*implements[\\s\n]+([A-Za-z0-9_ ,\\s\n]+))?[\\s\n]?\\{)";
-
-    const char *ZendParser::RGX_BUILTIN_TYPE =
-            "([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
-
-    const char *ZendParser::RGX_PHP_OPENING_TAG = "^(<\\?|<\\?php)";
-
-    const char *ZendParser::RGX_TYPE =
-            "([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
-
-    const char* ZendParser::RGX_EXCLUDE_COMMENT = "^((?!\\s*\\\\|/\\*|\\*)";
 
     ZendParser::ZendParser() {
         reader = new DirectoryReader();
         strings = new Strings();
         results = new vector<File>();
-        typesRegistry = new vector<PreparedType>();
-        typesRegistryUnfiltered = new vector<PreparedType>();
+        typesRegistry = new vector<parser::PreparedType>();
+        typesRegistryUnfiltered = new vector<parser::PreparedType>();
         vectorString = new vector<string>();
         setString = new set<string>();
 
@@ -93,7 +77,7 @@ namespace phpconvert {
 //			continue;
 //		}
 
-//		for (PreparedType val : file.prepTypes) {
+//		for (parser::PreparedType val : file.prepTypes) {
 //
 //			if ((!val.isMain && val.type.compare(builtInType) != 0)
 //					&& this->builtInTypes->find(builtInType)
@@ -119,7 +103,7 @@ namespace phpconvert {
             return;
         tmpSet.clear();
         string replace = "\n\n\n";
-        for (PreparedType &type : file.prepTypes) {
+        for (parser::PreparedType &type : file.prepTypes) {
             if (type.type.compare(file.mainType) != 0) {
                 if (tmpSet.find(type.type) != tmpSet.end()) {
                     continue;
@@ -133,7 +117,7 @@ namespace phpconvert {
         this->strings->replace(file.content, file.firstMainTypeFull, replace);
     }
 
-    void ZendParser::replaceType(PreparedType &type, File &file) {
+    void ZendParser::replaceType(parser::PreparedType &type, File &file) {
         string replaceFormat;
         char out[250];
 //	regexSearch = "([^'\"])(" + type.type + ")([^'\"])";
@@ -152,8 +136,8 @@ namespace phpconvert {
     }
 
     void ZendParser::replaceTypes(File &file) {
-        vector<PreparedType> tmp;
-        for (PreparedType &type : file.prepTypes) {
+        vector<parser::PreparedType> tmp;
+        for (parser::PreparedType &type : file.prepTypes) {
 //		cout << type.type + "-" +type.alias + "\n";
             if (this->builtInTypes->find(type.type) == this->builtInTypes->end()) {
                 replaceType(type, file);
@@ -163,15 +147,15 @@ namespace phpconvert {
 
     void ZendParser::replaceTypesMain(File &file) {
         vector<string> tmp;
-        for (PreparedType &type : file.prepTypesMain) {
+        for (parser::PreparedType &type : file.prepTypesMain) {
             type.alias = type.type;
             replaceType(type, file);
         }
     }
 
     void ZendParser::replaceTypesGlobal(File &file) {
-        PreparedType typeCopy;
-        vector<PreparedType>::iterator type = typesRegistry->begin();
+        parser::PreparedType typeCopy;
+        vector<parser::PreparedType>::iterator type = typesRegistry->begin();
         string replaceFormat;
         char out[250];
         for (; type != typesRegistry->end(); ++type) {
@@ -200,7 +184,7 @@ namespace phpconvert {
 
     void ZendParser::writeTypesRegistryFile() {
         string typesRegistryString;
-        vector<PreparedType>::iterator type = typesRegistry->begin();
+        vector<parser::PreparedType>::iterator type = typesRegistry->begin();
         for (; type != typesRegistry->end(); ++type) {
             typesRegistryString += (*type).type + " | " + (*type).raw + "\n";
         }
@@ -228,10 +212,10 @@ namespace phpconvert {
                 continue;
             }
             file.rootPath = it->dir;
-            for (PreparedType type : file.prepTypes) {
+            for (parser::PreparedType type : file.prepTypes) {
                 typesRegistryUnfiltered->push_back(type);
             }
-            for (PreparedType type : file.prepTypesMain) {
+            for (parser::PreparedType type : file.prepTypesMain) {
                 typesRegistryUnfiltered->push_back(type);
             }
             results->push_back(file);
@@ -355,7 +339,7 @@ namespace phpconvert {
                                   vector<string> &tmp) {
 //	cout << "file: " <<file.name << " ---------- \n";
         extractTypes(file.content, out, tmp);
-        PreparedType prepType;
+        parser::PreparedType prepType;
         for (pair<string, string> pair : out) {
 
             prepType.type = pair.first;
@@ -364,7 +348,7 @@ namespace phpconvert {
 //		cout << "first:" << pair.first << ",second:" << pair.second << "\n";
             file.prepTypes.push_back(prepType);
         }
-        vector<PreparedType> outPrep;
+        vector<parser::PreparedType> outPrep;
         filterPreparedTypes(file.prepTypes, outPrep);
         file.prepTypes = outPrep;
         generatePreparedTypes(file, tmp);
@@ -419,8 +403,8 @@ namespace phpconvert {
 
         size = out.size();
         int step = 6;
-        PreparedType tmpPrepType;
-        PreparedType prepType;
+        parser::PreparedType tmpPrepType;
+        parser::PreparedType prepType;
         prepType.isMain = true;
         for (unsigned int i = 0; i < size - 1; i += step) {
             mainTypeFull = out[i];
@@ -471,7 +455,7 @@ namespace phpconvert {
         }
 
         if (file.mainType.length() <= 0) {
-            for (PreparedType t : file.prepTypesMain) {
+            for (parser::PreparedType t : file.prepTypesMain) {
                 this->builtInTypes->insert(t.type);
             }
         }
@@ -542,34 +526,34 @@ namespace phpconvert {
         }
     }
 
-    void ZendParser::sortFaster(vector<PreparedType> &out) {
-        set<PreparedType> foos(out.begin(), out.end());
+    void ZendParser::sortFaster(vector<parser::PreparedType> &out) {
+        set<parser::PreparedType> foos(out.begin(), out.end());
         out.clear();
-        std::set<PreparedType>::iterator it;
+        std::set<parser::PreparedType>::iterator it;
         for (it = foos.begin(); it != foos.end(); ++it) {
             out.push_back(*it);
         }
     }
 
-    void ZendParser::sortSlower(vector<PreparedType> &out) {
+    void ZendParser::sortSlower(vector<parser::PreparedType> &out) {
         sort(out.begin(), out.end());
         out.erase(unique(out.begin(), out.end()), out.end());
         sort(out.begin(), out.end());
 //	sort(out.begin(), out.end(),
-//			[](const PreparedType& a, const PreparedType& b) -> bool
+//			[](const parser::PreparedType& a, const parser::PreparedType& b) -> bool
 //			{
 //				return a.type.size() > b.type.size();
 //			});
     }
 
-    void ZendParser::filterPreparedTypes(vector<PreparedType> &types,
-                                         vector<PreparedType> &out) {
+    void ZendParser::filterPreparedTypes(vector<parser::PreparedType> &types,
+                                         vector<parser::PreparedType> &out) {
         out.clear();
         size_t found;
         string typeCopy;
         vector<string> duplicates;
         vector<string>::iterator it;
-        for (PreparedType &type : types) {
+        for (parser::PreparedType &type : types) {
             boost::trim(type.type);
             if (type.type.empty())
                 continue;
@@ -638,16 +622,16 @@ namespace phpconvert {
         set<string> overlapping;
         stringstream stream;
         string className, classNameLower, tmpString, tmpClassNameLower;
-//	PreparedType preparedType;
+//	parser::PreparedType parser::PreparedType;
         size_t size;
 
-        for (PreparedType type : file.prepTypes) {
+        for (parser::PreparedType type : file.prepTypes) {
             className = generateAlias(type.type, 1, tmp);
             classNameLower = className;
             transform(classNameLower.begin(), classNameLower.end(),
                       classNameLower.begin(), ::tolower);
             int count = 0;
-            for (PreparedType typeCompared : file.prepTypes) {
+            for (parser::PreparedType typeCompared : file.prepTypes) {
                 tmpString = generateAlias(typeCompared.type, 1, tmp);
                 tmpClassNameLower = tmpString;
                 transform(tmpClassNameLower.begin(), tmpClassNameLower.end(),
@@ -663,7 +647,7 @@ namespace phpconvert {
             }
         }
 
-        for (PreparedType &preparedType : file.prepTypes) {
+        for (parser::PreparedType &preparedType : file.prepTypes) {
 
             strings->split(tmp, "_", preparedType.type);
 
@@ -752,7 +736,7 @@ namespace phpconvert {
 
     }
 
-    void ZendParser::generatePreparedTypeFull(PreparedType &outPrep,
+    void ZendParser::generatePreparedTypeFull(parser::PreparedType &outPrep,
                                               vector<string> &tmpVect) {
         vectorString->clear();
 
@@ -784,7 +768,7 @@ namespace phpconvert {
     void ZendParser::generatePreparedTypesGlobal(vector<string> &tmp) {
         vectorString->clear();
 
-        vector<PreparedType>::iterator type = typesRegistry->begin();
+        vector<parser::PreparedType>::iterator type = typesRegistry->begin();
         for (; type != typesRegistry->end(); ++type) {
             generatePreparedTypeFull(*type, *vectorString);
         }

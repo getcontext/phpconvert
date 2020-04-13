@@ -10,6 +10,8 @@ class CString {
 public:
     static const char *COMMENTS[];
     static const char *WHITE_CHARS[];
+    static const char SPACE;
+    static const char TAB;
 
     CString(const char *source);
 
@@ -19,10 +21,11 @@ public:
 
     const char *iterate();
 
-    bool isWhite(const char someChar);
+    bool isWhite();
 
 private:
     const char *source;
+    char current;
 
 };
 

@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
         app->run(AppParams::createFromRequest(argc, argv));
     } catch (SystemException &e) {
         cout << e.what();
-    } catch (exception &e) { //ooopss ;)
+    } catch (std::exception &e) { //ooopss ;)
         cout << e.what();
     }
 

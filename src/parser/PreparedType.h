@@ -1,5 +1,5 @@
 //
-// Created by wizard on 14.11.2019.
+// Created by wizard on 12.04.2020.
 //
 
 #ifndef PHPCONVERT_PREPAREDTYPE_H
@@ -11,75 +11,41 @@
 #include <algorithm>
 #include <fstream>
 #include <string>
-#include <vector>
 #include <set>
 #include <exception>
-
-using namespace std;
+#include <boost/wave.hpp>
+#include <boost/wave/cpplexer/cpp_lex_token.hpp>    // token class
+#include <boost/wave/cpplexer/cpp_lex_iterator.hpp> // lexer class
+#include "Parser.h"
+#include "utils/DirectoryReader.h"
+#include "utils/Regexer.h"
+#include "utils/Strings.h"
 
 namespace phpconvert {
-    class PreparedType {
-    public:
-        bool operator==(PreparedType &compared) const {
-            return typeLower.compare(compared.typeLower) == 0;
-        }
+    namespace parser {
+        class PreparedType {
 
-        bool operator<(PreparedType const &compared) const {
-            return typeLower.size() > compared.typeLower.size();
-        }
+        public:
+            string id;
+            string type;
+            string typeLower;
+            string usage;
+            string alias;
+            string raw;
+            string replace;
+            bool isMain = false;
+            string extends;
+            vector<string> implements;
 
-        const string &getId() const;
+            bool operator==(PreparedType &compared) const {
+                return typeLower.compare(compared.typeLower) == 0;
+            }
 
-        void setId(const string &id);
-
-        const string &getType() const;
-
-        void setType(const string &type);
-
-        const string &getTypeLower() const;
-
-        void setTypeLower(const string &typeLower);
-
-        const string &getUsage() const;
-
-        void setUsage(const string &usage);
-
-        const string &getAlias() const;
-
-        void setAlias(const string &alias);
-
-        const string &getRaw() const;
-
-        void setRaw(const string &raw);
-
-        const string &getReplace() const;
-
-        void setReplace(const string &replace);
-
-        bool isMain1() const;
-
-        void setIsMain(bool isMain);
-
-        const string &getExtends() const;
-
-        void setExtends(const string &extends);
-
-        const vector<string> &getImplements() const;
-
-        void setImplements(const vector<string> &implements);
-
-    private:
-        string id; //@todo new introduced field, fully qualified namespace with c/i name
-        string type;
-        string typeLower;
-        string usage;
-        string alias;
-        string raw;
-        string replace;
-        bool isMain = false;
-        string extends;
-        vector<string> implements;
-    };
+            bool operator<(PreparedType const &compared) const {
+                return typeLower.size() > compared.typeLower.size();
+            }
+        };
+    }
 }
 
 

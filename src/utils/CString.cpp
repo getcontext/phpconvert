@@ -11,11 +11,15 @@ const char *CString::COMMENTS[] = {
     "/",
     "*"
 };
+
 const char *CString::WHITE_CHARS[] = {
         "\r",
         "\n",
-        "\r\n"
+        "\t"
 };
+
+
+
 CString::CString(const char *source) : source(source) {
 
 }
@@ -31,7 +35,13 @@ const char *CString::stripComments() {
 
 const char *CString::iterate() {
     while (*source) {
+        current = *source;
         //one after another
+        *source++;
     }
     return nullptr;
+}
+
+bool CString::isWhite() {
+    return false;
 }

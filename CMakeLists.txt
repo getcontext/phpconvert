@@ -40,8 +40,8 @@ add_executable(
         src/AppParams.cpp
         src/AppParams.h
         src/AppParams_test.cpp
-        src/BaseParser.cpp
-        src/BaseParser.h
+        src/Parser.cpp
+        src/Parser.h
         src/Parser_test.cpp
         src/ParserManager.cpp
         src/ParserManager.h
