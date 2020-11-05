@@ -38,7 +38,7 @@ namespace phpconvert {
 
         Regexer *getRegexer();
 
-        File buildFile(DirectoryReader::Item *item,
+        parser::File buildFile(DirectoryReader::Item *item,
                        vector<pair<string, string> > &out, vector<string> &tmpOut,
                        vector<string> &tmp);
 
@@ -52,7 +52,7 @@ namespace phpconvert {
         void extractTypes(const string &line, vector<pair<string, string> > &out,
                           vector<string> &tmp);
 
-        void extractMainType(File &file, vector<string> &out, vector<string> &tmp);
+        void extractMainType(parser::File &file, vector<string> &out, vector<string> &tmp);
 
         void filterPreparedTypes(vector<parser::PreparedType> &types,
                                  vector<parser::PreparedType> &out);
@@ -62,7 +62,7 @@ namespace phpconvert {
         void generatePreparedTypeFull(parser::PreparedType &outPrep,
                                       vector<string> &tmpVect);
 
-        void generatePreparedTypes(File &file, vector<string> &tmp);
+        void generatePreparedTypes(parser::File &file, vector<string> &tmp);
 
         void generatePreparedTypesGlobal(vector<string> &tmp);
 
@@ -71,21 +71,21 @@ namespace phpconvert {
 
         void generateNamespace(const string &className, string &out);
 
-        void addNamespace(File &file);
+        void addNamespace(parser::File &file);
 
-        void addUsages(File &file, set<string> tmpSet);
+        void addUsages(parser::File &file, set<string> tmpSet);
 
-        void replaceTypes(File &file);
+        void replaceTypes(parser::File &file);
 
-        void replaceTypesMain(File &file);
+        void replaceTypesMain(parser::File &file);
 
-        void replaceTypesGlobal(File &file);
+        void replaceTypesGlobal(parser::File &file);
 
-        void replaceTypesBuiltIn(File &file);
+        void replaceTypesBuiltIn(parser::File &file);
 
-        void prepareTypesMain(File &file, vector<string> &out, vector<string> &tmp);
+        void prepareTypesMain(parser::File &file, vector<string> &out, vector<string> &tmp);
 
-        void prepareTypes(File &file, vector<pair<string, string> > &out,
+        void prepareTypes(parser::File &file, vector<pair<string, string> > &out,
                           vector<string> &tmp);
 
         string generateAlias(vector<string> &type, unsigned int parts);
@@ -94,7 +94,7 @@ namespace phpconvert {
 
         void writeTypesRegistryFile();
 
-        void buildFiles(File file, vector<string> tmpOut, int &processed,
+        void buildFiles(parser::File file, vector<string> tmpOut, int &processed,
                         vector<DirectoryReader::Item> *readerResult,
                         vector<pair<string, string> > &tmpOutPairs,
                         vector<string> &tmpVector);
@@ -105,7 +105,7 @@ namespace phpconvert {
 
         void writeFiles(const set<string> &tmpSet, int &generated);
 
-        void replaceType(parser::PreparedType &type, File &file);
+        void replaceType(parser::PreparedType &type, parser::File &file);
 
         string stripCmments(string const &input);
 
@@ -117,7 +117,7 @@ namespace phpconvert {
         set<string> *keywords;
         vector<parser::PreparedType> *typesRegistry;
         vector<parser::PreparedType> *typesRegistryUnfiltered;
-        vector<File> *results;
+        vector<parser::File> *results;
     };
 
 } /* namespace phpconvert */

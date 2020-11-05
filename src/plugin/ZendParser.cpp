@@ -15,7 +15,7 @@ namespace phpconvert {
     ZendParser::ZendParser() {
         reader = new DirectoryReader();
         strings = new Strings();
-        results = new vector<File>();
+        results = new vector<parser::File>();
         typesRegistry = new vector<parser::PreparedType>();
         typesRegistryUnfiltered = new vector<parser::PreparedType>();
         vectorString = new vector<string>();
@@ -43,7 +43,7 @@ namespace phpconvert {
         reader->setPath(sourceDir.c_str());
     }
 
-    void ZendParser::addNamespace(File &file) {
+    void ZendParser::addNamespace(parser::File &file) {
         if (file.mainType.empty())
             return;
         string tmp = "(<?|<?php)\n\nnamespace " + file.namespaceName + ";\n\n";
@@ -52,7 +52,7 @@ namespace phpconvert {
         this->strings->replace(file.content, rep, tmp);
     }
 
-    void ZendParser::replaceTypesBuiltIn(File &file) {
+    void ZendParser::replaceTypesBuiltIn(parser::File &file) {
         string replaceFormat, builtInType, fileName, className;
         char out[250];
         vector<string> tmp;
@@ -98,7 +98,7 @@ namespace phpconvert {
         }
     }
 
-    void ZendParser::addUsages(File &file, set<string> tmpSet) {
+    void ZendParser::addUsages(parser::File &file, set<string> tmpSet) {
         if (file.mainType.empty())
             return;
         tmpSet.clear();
@@ -117,7 +117,7 @@ namespace phpconvert {
         this->strings->replace(file.content, file.firstMainTypeFull, replace);
     }
 
-    void ZendParser::replaceType(parser::PreparedType &type, File &file) {
+    void ZendParser::replaceType(parser::PreparedType &type, parser::File &file) {
         string replaceFormat;
         char out[250];
 //	regexSearch = "([^'\"])(" + type.type + ")([^'\"])";
@@ -135,7 +135,7 @@ namespace phpconvert {
 //	strings->regexReplace(file.content, regexSearch, replaceFormat);
     }
 
-    void ZendParser::replaceTypes(File &file) {
+    void ZendParser::replaceTypes(parser::File &file) {
         vector<parser::PreparedType> tmp;
         for (parser::PreparedType &type : file.prepTypes) {
 //		cout << type.type + "-" +type.alias + "\n";
@@ -145,7 +145,7 @@ namespace phpconvert {
         }
     }
 
-    void ZendParser::replaceTypesMain(File &file) {
+    void ZendParser::replaceTypesMain(parser::File &file) {
         vector<string> tmp;
         for (parser::PreparedType &type : file.prepTypesMain) {
             type.alias = type.type;
@@ -153,7 +153,7 @@ namespace phpconvert {
         }
     }
 
-    void ZendParser::replaceTypesGlobal(File &file) {
+    void ZendParser::replaceTypesGlobal(parser::File &file) {
         parser::PreparedType typeCopy;
         vector<parser::PreparedType>::iterator type = typesRegistry->begin();
         string replaceFormat;
@@ -192,7 +192,7 @@ namespace phpconvert {
                                    typesRegistryString);
     }
 
-    void ZendParser::buildFiles(File file, vector<string> tmpOut, int &processed,
+    void ZendParser::buildFiles(parser::File file, vector<string> tmpOut, int &processed,
                                 vector<DirectoryReader::Item> *readerResult,
                                 vector<pair<string, string> > &tmpOutPairs, vector<string> &tmpVector) {
         for (vector<DirectoryReader::Item>::iterator it = readerResult->begin();
@@ -224,8 +224,8 @@ namespace phpconvert {
 
     void ZendParser::writeFiles(const set<string> &tmpSet, int &generated) {
         generated = 0;
-        File fileCopy;
-        for (vector<ZendParser::File>::iterator file = results->begin();
+        parser::File fileCopy;
+        for (vector<parser::File>::iterator file = results->begin();
              file != results->end(); ++file) {
 //				if (file->name.compare("View.php") != 0) {
 //					continue;
@@ -282,7 +282,7 @@ namespace phpconvert {
         vector<string> tmpOut, tmpVector/*unused now, moved to class*/;
         set<string> tmpSet/*unused now, moved to class*/;
         vector<pair<string, string>> tmpOutPairs;
-        File file;
+        parser::File file;
 
         buildFiles(file, tmpOut, processed, readerResult, tmpOutPairs, tmpVector);
 
@@ -335,7 +335,7 @@ namespace phpconvert {
 //	}
     }
 
-    void ZendParser::prepareTypes(File &file, vector<pair<string, string>> &out,
+    void ZendParser::prepareTypes(parser::File &file, vector<pair<string, string>> &out,
                                   vector<string> &tmp) {
 //	cout << "file: " <<file.name << " ---------- \n";
         extractTypes(file.content, out, tmp);
@@ -354,7 +354,7 @@ namespace phpconvert {
         generatePreparedTypes(file, tmp);
     }
 
-    void ZendParser::extractMainType(File &file, vector<string> &out,
+    void ZendParser::extractMainType(parser::File &file, vector<string> &out,
                                      vector<string> &tmp) {
         out.clear();
         tmp.clear();
@@ -383,7 +383,7 @@ namespace phpconvert {
         }
     }
 
-    void ZendParser::prepareTypesMain(File &file, vector<string> &out,
+    void ZendParser::prepareTypesMain(parser::File &file, vector<string> &out,
                                       vector<string> &tmp) {
         out.clear();
         vectorString->clear();
@@ -461,10 +461,10 @@ namespace phpconvert {
         }
     }
 
-    ZendParser::File ZendParser::buildFile(DirectoryReader::Item *item,
+    parser::File ZendParser::buildFile(DirectoryReader::Item *item,
                                            vector<pair<string, string>> &out, vector<string> &tmpOut,
                                            vector<string> &tmp) {
-        File file;
+        parser::File file;
         file.isValid = false;
 
         if (!item->isFile) {
@@ -474,7 +474,7 @@ namespace phpconvert {
         file.name = item->name;
         file.fullPath = item->fullPath;
         file.content = this->reader->readTextFile(item->fullPath);
-        file.mainTypes = new set<string>();
+        file.mainTypes = new set<string>(); //memleak (no delete)
 
         prepareTypesMain(file, tmpOut, tmp);
 
@@ -616,7 +616,7 @@ namespace phpconvert {
         return generateAlias(tmp, parts);
     }
 
-    void ZendParser::generatePreparedTypes(File &file, vector<string> &tmp) {
+    void ZendParser::generatePreparedTypes(parser::File &file, vector<string> &tmp) {
         tmp.clear();
 
         set<string> overlapping;
@@ -789,7 +789,7 @@ namespace phpconvert {
 /**d
  * @todo refactor it with parsing comments. server......
  *
- * @todo make it all c-string while parser , bit fck high versions but can do
+ * @todo make it all c-string while parser
  *
  */
     std::string ZendParser::stripCmments(std::string const &input) {
