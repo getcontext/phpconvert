@@ -78,7 +78,7 @@ namespace phpconvert {
                 || file.content.find(builtInType) == string::npos)
                 continue;
 
-            this->strings->split(tmp, "_", builtInType);
+            this->strings->split(tmp, "_", builtInType); //extract spacer like "_" (smiling a bit)
             className = tmp[tmp.size() - 1];
 
 //		if (className.compare(builtInType) == 0
