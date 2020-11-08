@@ -750,7 +750,7 @@ namespace phpconvert {
     void ZendParser::generatePreparedTypeFull(PreparedType &outPrep,
                                               vector<string> &tmpVect) {
         if (outPrep.type.find("_") == string::npos) {
-            outPrep.alias = "\\" + outPrep.type;
+            outPrep.alias = "\\" + outPrep.type; //extract const - ns sep.
             return;
         }
 
