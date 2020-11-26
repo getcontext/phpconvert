@@ -14,7 +14,7 @@ namespace phpconvert {
         AppParams *obj = new AppParams();
 
         obj->setValid(false);
-        obj->recursive = false;
+        obj->setRecursive(false);
 
         for (int i = 1; i < argc; i += 1) {
             current = argv[i];
