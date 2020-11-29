@@ -26,7 +26,7 @@ namespace phpconvert {
         switch (code) {
             case INVALID_PARAMETERS:
                 msg << "Invalid parameters\n";
-                msg << "Usage: zf2ns(.exe) <option(s)>\n";
+                msg << "Usage: phpconvert(.exe) <option(s)>\n";
                 msg << "Options:\n";
                 msg << "\t-d,\tSpecify the source directory\n";
                 msg << "\t-o,\tSpecify the output directory\n";
