@@ -1,4 +1,4 @@
-# zf2ns
+# phpconvert
 converts zend 1 type names to namespace style names, 
 transforms classes , interfaces from Old_Style_Namespace to \New\Style\Namespace , 
 adds usages like 'use \Zend\Db\Sql\Abstract\Class as DbSqlAbstractClass;' and 'namespace \Zend\Db\Sql\Abstract;' (zum beispiel)
