@@ -4,7 +4,7 @@ transforms classes , interfaces from Old_Style_Namespace to \New\Style\Namespace
 adds usages like 'use \Zend\Db\Sql\Abstract\Class as DbSqlAbstractClass;' and 'namespace \Zend\Db\Sql\Abstract;' (zum beispiel)
 tested with PhpStorm 8,Win64 
 
-example command : -d D:/www/digitalus_cms -o D:/zf2ns/digitalus_cms -r
+example command : -d D:/www/digitalus_cms -o D:/phpconvert/digitalus_cms -r
 
 run options : 
 

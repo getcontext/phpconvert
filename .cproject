@@ -76,7 +76,7 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.mingw.exe.release.738692152." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.exe.release.34653880" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.exe.release">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.mingw.exe.release.465564313" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.exe.release"/>
-							<builder buildPath="${workspace_loc:/zf2ns}/Release" id="cdt.managedbuild.tool.gnu.builder.mingw.base.799482500" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
+							<builder buildPath="${workspace_loc:/phpconvert}/Release" id="cdt.managedbuild.tool.gnu.builder.mingw.base.799482500" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.exe.release.1116068654" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.exe.release">
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.135535354" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -106,7 +106,7 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="zf2ns.cdt.managedbuild.target.gnu.mingw.exe.46279834" name="Executable" projectType="cdt.managedbuild.target.gnu.mingw.exe"/>
+		<project id="phpconvert.cdt.managedbuild.target.gnu.mingw.exe.46279834" name="Executable" projectType="cdt.managedbuild.target.gnu.mingw.exe"/>
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
@@ -138,10 +138,10 @@
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Debug">
-			<resource resourceType="PROJECT" workspacePath="/zf2ns"/>
+			<resource resourceType="PROJECT" workspacePath="/phpconvert"/>
 		</configuration>
 		<configuration configurationName="Release">
-			<resource resourceType="PROJECT" workspacePath="/zf2ns"/>
+			<resource resourceType="PROJECT" workspacePath="/phpconvert"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>

@@ -16,8 +16,8 @@ namespace phpconvert {
 
         virtual ~Php7Parser();
     protected:
-        PhpReturnType *detectReturnType(PhpMethod method);
-        PhpReturnType *detectReturnType(PhpFunction func);
+//        PhpReturnType *detectReturnType(PhpMethod method);
+//        PhpReturnType *detectReturnType(PhpFunction func);
         //write test
     };
 }
