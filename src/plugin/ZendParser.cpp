@@ -671,7 +671,8 @@ namespace phpconvert {
             preparedType.type = stream.str().substr(0, stream.str().length() - 1);
 
             tmpClassNameLower = className;
-            toLower(tmpClassNameLower);
+            transform(tmpClassNameLower.begin(), tmpClassNameLower.end(),
+                      tmpClassNameLower.begin(), ::tolower);
 
             if (!hasMainType(file)) {
                 processFileProcedural(file, tmpString, tmpClassNameLower, preparedType, tmpVector, stream);
@@ -682,11 +683,6 @@ namespace phpconvert {
             }
         }
 
-    }
-
-    void ZendParser::toLower(string &tmpClassNameLower) const {
-        transform(tmpClassNameLower.begin(), tmpClassNameLower.end(),
-              tmpClassNameLower.begin(), ::tolower);
     }
 
     void
@@ -703,8 +699,8 @@ namespace phpconvert {
                 size = tmpVector.size() - 1;
             }
             preparedType.alias = generateAlias(tmpVector, size);
-            stream.str(string());
             stream.clear();
+            stream.str(string()); //make it double secured
             copy(tmpVector.begin(), tmpVector.end() - 1,
                  ostream_iterator<string>(stream, "_"));
             generateNamespace(
@@ -719,8 +715,7 @@ namespace phpconvert {
             }
             preparedType.alias = generateAlias(tmpVector, size);
             preparedType.usage = "";
-        } else if (builtInTypes->find(preparedType.type)
-                   != builtInTypes->end()) {
+        } else if (isBuiltInType(preparedType)) {
             preparedType.alias = "\\\\" + preparedType.type;
             preparedType.usage = "";
         } else if (overlapping.find(className) != overlapping.end()) {
