@@ -141,6 +141,15 @@ namespace phpconvert {
         bool isKeyword(const string &tmpClassNameLower);
 
         bool isMainType(const File &file, const PreparedType &preparedType) const;
+
+        void
+        processFileProcedural(const File &file, string &tmpString, const string &tmpClassNameLower,
+                              PreparedType &preparedType,
+                              vector<string> &tmpVector, stringstream &stream);
+
+        void processFileObjectOriented(const File &file, set<string> &overlapping, const string &className,
+                                       const string &tmpClassNameLower, size_t size, PreparedType &preparedType,
+                                       vector<string> &tmpVector, stringstream &stream);
     };
 
 } /* namespace phpconvert */

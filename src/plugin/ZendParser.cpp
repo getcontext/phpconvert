@@ -675,75 +675,92 @@ namespace phpconvert {
                       tmpClassNameLower.begin(), ::tolower);
 
             if (!hasMainType(file)) {
-                if (isBuiltInType(preparedType)) {
-                    preparedType.alias = "\\\\" + preparedType.type;
-                } else if (isInMainTypes(file, preparedType)) {
-                    preparedType.alias = preparedType.type;
-                    builtInTypes->insert(preparedType.type);
-                } else if (isKeyword(tmpClassNameLower)) {
-                    string alias = generateAlias(tmpVector, 2);
-                    stream.str(string());
-                    stream.clear();
-                    copy(tmpVector.begin(), tmpVector.end() - 1,
-                         std::ostream_iterator<string>(stream, "_"));
-
-                    generateNamespace(
-                            stream.str().substr(0, stream.str().length() - 1) + "_"
-                            + alias, tmpString);
-
-                    preparedType.alias = "\\" + tmpString;
-//				    cout <<"isKeyword alias: "<<preparedType.alias<<"\n";
-                } else {
-//                    cout <<"standard type alias: \n";
-                    generateNamespace(preparedType.type, preparedType.alias);
-                    preparedType.alias = "\\" + preparedType.alias;
-//				    cout <<preparedType.alias<<"\n";
-                }
+                processFileProcedural(file, tmpString, tmpClassNameLower, preparedType, tmpVector, stream);
             } else {
 //                cout << "file: " + file.name + " has no classes/interfaces\n";
-                if (isKeyword(tmpClassNameLower)
-                    && !isMainType(file, preparedType)) {
-                    if (tmpVector.size() == 2) {
-                        size = 2;
-                    } else {
-                        size = tmpVector.size() - 1;
-                    }
-                    preparedType.alias = generateAlias(tmpVector, size);
-                    stream.str(string());
-                    stream.clear();
-                    copy(tmpVector.begin(), tmpVector.end() - 1,
-                         std::ostream_iterator<string>(stream, "_"));
-                    generateNamespace(
-                            stream.str().substr(0, stream.str().length() - 1) + "_"
-                            + generateAlias(tmpVector, 2), preparedType.usage);
-
-                } else if (isMainType(file, preparedType)) {
-                    if (isKeyword(tmpClassNameLower)) {
-                        size = 2;
-                    } else {
-                        size = 1;
-                    }
-                    preparedType.alias = generateAlias(tmpVector, size);
-                    preparedType.usage = "";
-                } else if (this->builtInTypes->find(preparedType.type)
-                           != this->builtInTypes->end()) {
-                    preparedType.alias = "\\\\" + preparedType.type;
-                    preparedType.usage = "";
-                } else if (overlapping.find(className) != overlapping.end()) {
-                    if (tmpVector.size() == 2) {
-                        size = 2;
-                    } else {
-                        size = tmpVector.size() - 1;
-                    }
-                    preparedType.alias = generateAlias(tmpVector, size);
-                    generateNamespace(preparedType.type, preparedType.usage);
-                } else {
-                    preparedType.alias = generateAlias(tmpVector, 1);
-                    generateNamespace(preparedType.type, preparedType.usage);
-                }
+                processFileObjectOriented(file, overlapping, className, tmpClassNameLower, size, preparedType,
+                                          tmpVector, stream);
             }
         }
 
+    }
+
+    void
+    ZendParser::processFileObjectOriented(const BaseParser::File &file, set<string> &overlapping,
+                                          const string &className,
+                                          const string &tmpClassNameLower, size_t size,
+                                          BaseParser::PreparedType &preparedType, vector<string> &tmpVector,
+                                          stringstream &stream) {
+        if (isKeyword(tmpClassNameLower)
+            && !isMainType(file, preparedType)) {
+            if (tmpVector.size() == 2) {
+                size = 2;
+            } else {
+                size = tmpVector.size() - 1;
+            }
+            preparedType.alias = generateAlias(tmpVector, size);
+            stream.str(string());
+            stream.clear();
+            copy(tmpVector.begin(), tmpVector.end() - 1,
+                 ostream_iterator<string>(stream, "_"));
+            generateNamespace(
+                    stream.str().substr(0, stream.str().length() - 1) + "_"
+                    + generateAlias(tmpVector, 2), preparedType.usage);
+
+        } else if (isMainType(file, preparedType)) {
+            if (isKeyword(tmpClassNameLower)) {
+                size = 2;
+            } else {
+                size = 1;
+            }
+            preparedType.alias = generateAlias(tmpVector, size);
+            preparedType.usage = "";
+        } else if (builtInTypes->find(preparedType.type)
+                   != builtInTypes->end()) {
+            preparedType.alias = "\\\\" + preparedType.type;
+            preparedType.usage = "";
+        } else if (overlapping.find(className) != overlapping.end()) {
+            if (tmpVector.size() == 2) {
+                size = 2;
+            } else {
+                size = tmpVector.size() - 1;
+            }
+            preparedType.alias = generateAlias(tmpVector, size);
+            generateNamespace(preparedType.type, preparedType.usage);
+        } else {
+            preparedType.alias = generateAlias(tmpVector, 1);
+            generateNamespace(preparedType.type, preparedType.usage);
+        }
+    }
+
+    void
+    ZendParser::processFileProcedural(const BaseParser::File &file, string &tmpString, const string &tmpClassNameLower,
+                                      BaseParser::PreparedType &preparedType, vector<string> &tmpVector,
+                                      stringstream &stream) {
+        if (isBuiltInType(preparedType)) {
+            preparedType.alias = "\\\\" + preparedType.type;
+        } else if (isInMainTypes(file, preparedType)) {
+            preparedType.alias = preparedType.type;
+            builtInTypes->insert(preparedType.type);
+        } else if (isKeyword(tmpClassNameLower)) {
+            string alias = generateAlias(tmpVector, 2);
+            stream.str(string());
+            stream.clear();
+            copy(tmpVector.begin(), tmpVector.end() - 1,
+                 ostream_iterator<string>(stream, "_"));
+
+            generateNamespace(
+                    stream.str().substr(0, stream.str().length() - 1) + "_"
+                    + alias, tmpString);
+
+            preparedType.alias = "\\" + tmpString;
+//				    cout <<"isKeyword alias: "<<preparedType.alias<<"\n";
+        } else {
+//                    cout <<"standard type alias: \n";
+            generateNamespace(preparedType.type, preparedType.alias);
+            preparedType.alias = "\\" + preparedType.alias;
+//				    cout <<preparedType.alias<<"\n";
+        }
     }
 
     bool ZendParser::isMainType(const BaseParser::File &file,
