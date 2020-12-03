@@ -671,8 +671,7 @@ namespace phpconvert {
             preparedType.type = stream.str().substr(0, stream.str().length() - 1);
 
             tmpClassNameLower = className;
-            transform(tmpClassNameLower.begin(), tmpClassNameLower.end(),
-                      tmpClassNameLower.begin(), ::tolower);
+            toLower(tmpClassNameLower);
 
             if (!hasMainType(file)) {
                 processFileProcedural(file, tmpString, tmpClassNameLower, preparedType, tmpVector, stream);
@@ -683,6 +682,11 @@ namespace phpconvert {
             }
         }
 
+    }
+
+    void ZendParser::toLower(string &tmpClassNameLower) const {
+        transform(tmpClassNameLower.begin(), tmpClassNameLower.end(),
+              tmpClassNameLower.begin(), ::tolower);
     }
 
     void
