@@ -630,7 +630,7 @@ namespace phpconvert {
     void ZendParser::generatePreparedTypes(File &file, vector<string> &tmpVector) {
         tmpVector.clear();
 
-        set<string> overlapping;
+        set<string> duplicatesSet;
         stringstream stream;
         string className, classNameLower, tmpString, tmpClassNameLower;
 //	PreparedType preparedType;
@@ -654,7 +654,7 @@ namespace phpconvert {
             if (count > 1
                 || this->builtInTypes->find(className)
                    != this->builtInTypes->end()) {
-                overlapping.insert(className);
+                duplicatesSet.insert(className);
             }
         }
 
@@ -678,7 +678,7 @@ namespace phpconvert {
                 processFileProcedural(file, tmpString, tmpClassNameLower, preparedType, tmpVector, stream);
             } else {
 //                cout << "file: " + file.name + " has no classes/interfaces\n";
-                processFileObjectOriented(file, overlapping, className, tmpClassNameLower, size, preparedType,
+                processFileObjectOriented(file, duplicatesSet, className, tmpClassNameLower, size, preparedType,
                                           tmpVector, stream);
             }
         }
@@ -686,7 +686,7 @@ namespace phpconvert {
     }
 
     void
-    ZendParser::processFileObjectOriented(const BaseParser::File &file, set<string> &overlapping,
+    ZendParser::processFileObjectOriented(const BaseParser::File &file, set<string> &duplicatesSet,
                                           const string &className,
                                           const string &tmpClassNameLower, size_t size,
                                           BaseParser::PreparedType &preparedType, vector<string> &tmpVector,
@@ -718,7 +718,7 @@ namespace phpconvert {
         } else if (isBuiltInType(preparedType)) {
             preparedType.alias = "\\\\" + preparedType.type;
             preparedType.usage = "";
-        } else if (overlapping.find(className) != overlapping.end()) {
+        } else if (isDuplicate(duplicatesSet, className)) {
             if (tmpVector.size() == 2) {
                 size = 2;
             } else {
@@ -731,6 +731,9 @@ namespace phpconvert {
             generateNamespace(preparedType.type, preparedType.usage);
         }
     }
+
+    bool ZendParser::isDuplicate(set<string> &duplicateSet,
+                                 const string &className) const { return duplicateSet.find(className) != duplicateSet.end(); }
 
     void
     ZendParser::processFileProcedural(const BaseParser::File &file, string &tmpString, const string &tmpClassNameLower,
