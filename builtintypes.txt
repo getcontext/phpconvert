@@ -14,6 +14,7 @@ BadFunctionCallException
 BadMethodCallException
 CachingIterator
 CallbackFilterIterator
+Class
 Countable
 DirectoryIterator
 DomainException
@@ -24,6 +25,7 @@ GlobIterator
 InfiniteIterator
 InvalidArgumentException
 IteratorIterator
+Interface
 LengthException
 LimitIterator
 LogicException
