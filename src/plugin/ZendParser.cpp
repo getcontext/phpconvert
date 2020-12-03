@@ -199,7 +199,7 @@ namespace phpconvert {
         for (; type != typesRegistry->end(); ++type) {
             typesRegistryString += (*type).type + " | " + (*type).raw + "\n";
         }
-        getReader()->writeTextFile(outputDir + "\\typesregistry.txt",
+        getReader()->writeTextFile(outputDir + DirectoryReader::getDirectorySeparator() + "typesregistry.txt",
                                    typesRegistryString);
     }
 
@@ -257,7 +257,7 @@ namespace phpconvert {
 //			continue;
 //		}
             fileCopy = *file;
-            getReader()->createDir(outputDir + "\\" + file->rootPath);
+            getReader()->createDir(outputDir + DirectoryReader::getDirectorySeparator() + file->rootPath);
             replaceTypesBuiltIn(fileCopy);
 //		cout << fileCopy.mainType << "\n";
             if (fileCopy.mainType.length() > 0) {
@@ -270,7 +270,7 @@ namespace phpconvert {
             replaceTypesGlobal(fileCopy);
 
             getReader()->writeTextFile(
-                    outputDir + "\\" + fileCopy.rootPath + fileCopy.name,
+                    outputDir + DirectoryReader::getDirectorySeparator() + fileCopy.rootPath + fileCopy.name,
                     fileCopy.content);
             generated++;
         }
@@ -800,7 +800,7 @@ namespace phpconvert {
     std::string ZendParser::stripCmments(std::string const &input) {
         std::string output;
         typedef boost::wave::cpplexer::lex_token<> token_type;
-        typedef boost::wave::cpplexer::lex_iterator <token_type> lexer_type;
+        typedef boost::wave::cpplexer::lex_iterator<token_type> lexer_type;
         typedef token_type::position_type position_type;
 
         position_type pos;

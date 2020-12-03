@@ -43,24 +43,25 @@ public:
 	void setPath(const char* p);
 	const char* getPath();
 	vector<Item> *getResults();
-	DirectoryReader::OS getOS();
+	static DirectoryReader::OS getOS();
 	string readTextFile(const string path);
 	bool writeTextFile(const string path, const string& content);
 	void createDir(const string path);
-	void removeDir(const string path);
-	/*
+    void removeDir(const string path);
+    static string getDirectorySeparator();
+    /*
 	 * windows based systems directory separator
 	 */
 	static const string WIN_DS;
-	/*
+    /*
 	 * unix/linux based systems directory separator
 	 */
 	static const string NIX_DS;
 protected:
-	const char* path;
+    const char* path;
 private:
-	vector<Item> *result;
 
+	vector<Item> *result;
 };
 
 } /* namespace phpconvert */

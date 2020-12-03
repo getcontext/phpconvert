@@ -33,16 +33,9 @@ void DirectoryReader::read() {
 		if (name == "." || name == "..")
 			continue;
 
-		OS os = getOS();
-		string separator;
+        string separator = getDirectorySeparator();
 
-		if (os == DirectoryReader::Win) {
-			separator = DirectoryReader::NIX_DS;
-		} else if (os == DirectoryReader::Nix) {
-			separator = DirectoryReader::NIX_DS;
-		}
-
-		string fullPath = rootPath + separator + name;
+        string fullPath = rootPath + separator + name;
 
 		struct stat st;
 		stat(fullPath.c_str(), &st);
@@ -57,7 +50,19 @@ void DirectoryReader::read() {
 	closedir(dir);
 }
 
-void DirectoryReader::read(const char* dirName, string baseDir) {
+    string DirectoryReader::getDirectorySeparator() { //cache it
+        OS os = getOS();
+        string separator; //make it static
+
+        if (os == Win) {
+            separator = NIX_DS;
+        } else if (os == Nix) {
+            separator = NIX_DS;
+        }
+        return separator;
+    }
+
+    void DirectoryReader::read(const char* dirName, string baseDir) {
 	DIR *dir;
 	dirent *ent;
 
@@ -128,9 +133,15 @@ DirectoryReader::OS DirectoryReader::getOS() {
 	const char* a = "win";
 #elif _WIN64
 	const char* a = "win";
+#elif _WINT_T
+    const char* a = "win";
 #elif __unix
 	const char* a = "nix";
+#elif __unix__
+	const char* a = "nix";
 #elif __linux
+	const char* a = "nix";
+#elif __linux__
 	const char* a = "nix";
 #endif
 
