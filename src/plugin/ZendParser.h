@@ -72,7 +72,7 @@ namespace phpconvert {
         void generatePreparedTypeFull(PreparedType &outPrep,
                                       vector<string> &tmpVect);
 
-        void generatePreparedTypes(File &file, vector<string> &tmp);
+        void generatePreparedTypes(File &file, vector<string> &tmpVector);
 
         void generatePreparedTypesGlobal(vector<string> &tmp);
 
@@ -131,6 +131,16 @@ namespace phpconvert {
         vector<PreparedType> *typesRegistryUnfiltered;
 
         vector<File> *results;
+
+        bool isBuiltInType(const PreparedType &preparedType);
+
+        bool isInMainTypes(const File &file, const PreparedType &preparedType) const;
+
+        bool hasMainType(const File &file) const;
+
+        bool isKeyword(const string &tmpClassNameLower);
+
+        bool isMainType(const File &file, const PreparedType &preparedType) const;
     };
 
 } /* namespace phpconvert */

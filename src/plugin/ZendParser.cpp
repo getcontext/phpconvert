@@ -267,7 +267,7 @@ namespace phpconvert {
                 replaceTypes(fileCopy);
             }
 
-            replaceTypesGlobal(fileCopy);
+//            replaceTypesGlobal(fileCopy);
 
             getReader()->writeTextFile(
                     outputDir + DirectoryReader::getDirectorySeparator() + fileCopy.rootPath + fileCopy.name,
@@ -283,7 +283,7 @@ namespace phpconvert {
         getReader()->createDir(outputDir);
 
         if (isRecurisve())
-            getReader()->read(getReader()->getPath(), "/");
+            getReader()->read(getReader()->getPath(), "/"); //fix it for windows
         else
             getReader()->read();
 
@@ -627,8 +627,8 @@ namespace phpconvert {
         return generateAlias(tmp, parts);
     }
 
-    void ZendParser::generatePreparedTypes(File &file, vector<string> &tmp) {
-        tmp.clear();
+    void ZendParser::generatePreparedTypes(File &file, vector<string> &tmpVector) {
+        tmpVector.clear();
 
         set<string> overlapping;
         stringstream stream;
@@ -637,13 +637,13 @@ namespace phpconvert {
         size_t size;
 
         for (PreparedType type : file.prepTypes) {
-            className = generateAlias(type.type, 1, tmp);
+            className = generateAlias(type.type, 1, tmpVector);
             classNameLower = className;
             transform(classNameLower.begin(), classNameLower.end(),
                       classNameLower.begin(), ::tolower);
             int count = 0;
             for (PreparedType typeCompared : file.prepTypes) {
-                tmpString = generateAlias(typeCompared.type, 1, tmp);
+                tmpString = generateAlias(typeCompared.type, 1, tmpVector);
                 tmpClassNameLower = tmpString;
                 transform(tmpClassNameLower.begin(), tmpClassNameLower.end(),
                           tmpClassNameLower.begin(), ::tolower);
@@ -660,13 +660,13 @@ namespace phpconvert {
 
         for (PreparedType &preparedType : file.prepTypes) {
 
-            strings->split(tmp, "_", preparedType.type);
+            strings->split(tmpVector, "_", preparedType.type);
 
-            className = tmp[tmp.size() - 1];
+            className = tmpVector[tmpVector.size() - 1];
 
             stream.str(string());
             stream.clear();
-            copy(tmp.begin(), tmp.end(),
+            copy(tmpVector.begin(), tmpVector.end(),
                  std::ostream_iterator<string>(stream, "_"));
             preparedType.type = stream.str().substr(0, stream.str().length() - 1);
 
@@ -674,20 +674,17 @@ namespace phpconvert {
             transform(tmpClassNameLower.begin(), tmpClassNameLower.end(),
                       tmpClassNameLower.begin(), ::tolower);
 
-            if (file.mainType.empty()) {
-                if (this->builtInTypes->find(preparedType.type)
-                    != this->builtInTypes->end()) {
+            if (!hasMainType(file)) {
+                if (isBuiltInType(preparedType)) {
                     preparedType.alias = "\\\\" + preparedType.type;
-                } else if (file.mainTypes->find(preparedType.type)
-                           != file.mainTypes->end()) {
+                } else if (isInMainTypes(file, preparedType)) {
                     preparedType.alias = preparedType.type;
                     builtInTypes->insert(preparedType.type);
-                } else if (this->keywords->find(tmpClassNameLower)
-                           != this->keywords->end()) {
-                    string alias = generateAlias(tmp, 2);
+                } else if (isKeyword(tmpClassNameLower)) {
+                    string alias = generateAlias(tmpVector, 2);
                     stream.str(string());
                     stream.clear();
-                    copy(tmp.begin(), tmp.end() - 1,
+                    copy(tmpVector.begin(), tmpVector.end() - 1,
                          std::ostream_iterator<string>(stream, "_"));
 
                     generateNamespace(
@@ -695,56 +692,78 @@ namespace phpconvert {
                             + alias, tmpString);
 
                     preparedType.alias = "\\" + tmpString;
+//				    cout <<"isKeyword alias: "<<preparedType.alias<<"\n";
                 } else {
+//                    cout <<"standard type alias: \n";
                     generateNamespace(preparedType.type, preparedType.alias);
                     preparedType.alias = "\\" + preparedType.alias;
-//				cout <<preparedType.alias<<"\n";
+//				    cout <<preparedType.alias<<"\n";
                 }
             } else {
-                if (this->keywords->find(tmpClassNameLower) != this->keywords->end()
-                    && preparedType.type.compare(file.mainType) != 0) {
-                    if (tmp.size() == 2) {
+//                cout << "file: " + file.name + " has no classes/interfaces\n";
+                if (isKeyword(tmpClassNameLower)
+                    && !isMainType(file, preparedType)) {
+                    if (tmpVector.size() == 2) {
                         size = 2;
                     } else {
-                        size = tmp.size() - 1;
+                        size = tmpVector.size() - 1;
                     }
-                    preparedType.alias = generateAlias(tmp, size);
+                    preparedType.alias = generateAlias(tmpVector, size);
                     stream.str(string());
                     stream.clear();
-                    copy(tmp.begin(), tmp.end() - 1,
+                    copy(tmpVector.begin(), tmpVector.end() - 1,
                          std::ostream_iterator<string>(stream, "_"));
                     generateNamespace(
                             stream.str().substr(0, stream.str().length() - 1) + "_"
-                            + generateAlias(tmp, 2), preparedType.usage);
+                            + generateAlias(tmpVector, 2), preparedType.usage);
 
-                } else if (preparedType.type.compare(file.mainType) == 0) {
-                    if (this->keywords->find(tmpClassNameLower)
-                        != this->keywords->end()) {
+                } else if (isMainType(file, preparedType)) {
+                    if (isKeyword(tmpClassNameLower)) {
                         size = 2;
                     } else {
                         size = 1;
                     }
-                    preparedType.alias = generateAlias(tmp, size);
+                    preparedType.alias = generateAlias(tmpVector, size);
                     preparedType.usage = "";
                 } else if (this->builtInTypes->find(preparedType.type)
                            != this->builtInTypes->end()) {
                     preparedType.alias = "\\\\" + preparedType.type;
                     preparedType.usage = "";
                 } else if (overlapping.find(className) != overlapping.end()) {
-                    if (tmp.size() == 2) {
+                    if (tmpVector.size() == 2) {
                         size = 2;
                     } else {
-                        size = tmp.size() - 1;
+                        size = tmpVector.size() - 1;
                     }
-                    preparedType.alias = generateAlias(tmp, size);
+                    preparedType.alias = generateAlias(tmpVector, size);
                     generateNamespace(preparedType.type, preparedType.usage);
                 } else {
-                    preparedType.alias = generateAlias(tmp, 1);
+                    preparedType.alias = generateAlias(tmpVector, 1);
                     generateNamespace(preparedType.type, preparedType.usage);
                 }
             }
         }
 
+    }
+
+    bool ZendParser::isMainType(const BaseParser::File &file,
+                                const BaseParser::PreparedType &preparedType) const { return preparedType.type.compare(file.mainType) == 0; }
+
+    bool ZendParser::isKeyword(const string &tmpClassNameLower) {
+        return keywords->find(tmpClassNameLower)
+               != keywords->end();
+    }
+
+    bool ZendParser::hasMainType(const BaseParser::File &file) const { return !file.mainType.empty(); }
+
+    bool ZendParser::isInMainTypes(const BaseParser::File &file, const BaseParser::PreparedType &preparedType) const {
+        return file.mainTypes->find(preparedType.type)
+                       != file.mainTypes->end();
+    }
+
+    bool ZendParser::isBuiltInType(const BaseParser::PreparedType &preparedType) {
+        return builtInTypes->find(preparedType.type)
+               != builtInTypes->end();
     }
 
     void ZendParser::generatePreparedTypeFull(PreparedType &outPrep,
