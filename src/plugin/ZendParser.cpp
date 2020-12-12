@@ -28,7 +28,7 @@ namespace phpconvert {
 
     ZendParser::ZendParser() {
         reader = new DirectoryReader();
-        strings = new StringHelper();
+        stringHelper = new StringHelper();
 
         results = new vector<File>();
         typesRegistry = new vector<PreparedType>();
@@ -40,7 +40,7 @@ namespace phpconvert {
 
     ZendParser::~ZendParser() {
         delete reader;
-        delete strings;
+        delete stringHelper;
         delete results;
         delete typesRegistry;
         delete typesRegistryUnfiltered;
@@ -60,7 +60,7 @@ namespace phpconvert {
         string tmp = "<?php\n\nnamespace " + file.namespaceName + ";\n\n";
         string rep = "<?php"; //@todo fix, make it array, add "<?" , it is also beginning of php files
         //@commit extract isPhp() method
-        this->strings->replace(file.content, rep, tmp);
+        this->stringHelper->replace(file.content, rep, tmp);
     }
 
     void ZendParser::replaceTypesBuiltIn(File &file) {
@@ -68,7 +68,7 @@ namespace phpconvert {
         char out[250];
         vector<string> tmp;
 
-        this->strings->split(tmp, ".", file.name);
+        this->stringHelper->split(tmp, ".", file.name);
         fileName = tmp[0];
 
         for (set<string>::iterator it = builtInTypes->begin();
@@ -78,7 +78,7 @@ namespace phpconvert {
                 || file.content.find(builtInType) == string::npos)
                 continue;
 
-            this->strings->split(tmp, "_", builtInType); //extract spacer like "_" (smiling a bit)
+            this->stringHelper->split(tmp, "_", builtInType); //extract spacer like "_" (smiling a bit)
             className = tmp[tmp.size() - 1];
 
 //		if (className.compare(builtInType) == 0
@@ -97,13 +97,13 @@ namespace phpconvert {
             string regexSearch(out);
             replaceFormat = "$1\\\\" + builtInType + "$3";
 
-//				strings->regexReplace(val.replace, regexSearch, replaceFormat);
+//				stringHelper->regexReplace(val.replace, regexSearch, replaceFormat);
 //
-//				strings->regexReplace(file.content, val.raw, val.replace);
+//				stringHelper->regexReplace(file.content, val.raw, val.replace);
 
-            strings->regexReplace(file.content, regexSearch, replaceFormat);
-            strings->regexReplace(file.firstMainTypeFull, regexSearch,
-                                  replaceFormat);
+            stringHelper->regexReplace(file.content, regexSearch, replaceFormat);
+            stringHelper->regexReplace(file.firstMainTypeFull, regexSearch,
+                                       replaceFormat);
 //			}
 //		}
         }
@@ -125,7 +125,7 @@ namespace phpconvert {
         }
         replace += "\n\n\n";
         replace += file.firstMainTypeFull;
-        this->strings->replace(file.content, file.firstMainTypeFull, replace);
+        this->stringHelper->replace(file.content, file.firstMainTypeFull, replace);
     }
 
     void ZendParser::replaceType(PreparedType &type, File &file) {
@@ -141,9 +141,9 @@ namespace phpconvert {
 //	cout << regexSearch + "-"+
 //	replaceFormat + "\n";
 
-        strings->regexReplace(file.content, regexSearch, replaceFormat);
+        stringHelper->regexReplace(file.content, regexSearch, replaceFormat);
 
-//	strings->regexReplace(file.content, regexSearch, replaceFormat);
+//	stringHelper->regexReplace(file.content, regexSearch, replaceFormat);
     }
 
     void ZendParser::replaceTypes(File &file) {
@@ -181,15 +181,15 @@ namespace phpconvert {
             string regexSearch(out);
             replaceFormat = "$1" + typeCopy.alias + "$3";
 
-            strings->regexReplace(file.content, regexSearch, replaceFormat);
-//				strings->regexReplace(file.firstMainTypeFull, regexSearch,
+            stringHelper->regexReplace(file.content, regexSearch, replaceFormat);
+//				stringHelper->regexReplace(file.firstMainTypeFull, regexSearch,
 //						replaceFormat);
 
-//				strings->regexReplace(val.replace, regexSearch, replaceFormat);
+//				stringHelper->regexReplace(val.replace, regexSearch, replaceFormat);
 //
-//				strings->regexReplace(file.content, val.raw, val.replace);
+//				stringHelper->regexReplace(file.content, val.raw, val.replace);
 
-//				this->strings->replace(file.content, typeCopy.type, typeCopy.alias);
+//				this->stringHelper->replace(file.content, typeCopy.type, typeCopy.alias);
         }
     }
 
@@ -428,10 +428,10 @@ namespace phpconvert {
             prepType.raw = mainTypeFull;
             prepType.replace = mainTypeFull;
 
-            this->strings->split(tmp, "_", mainType);
+            this->stringHelper->split(tmp, "_", mainType);
             className = tmp[tmp.size() - 1];
 
-            this->strings->split(tmp, ".", file.name);
+            this->stringHelper->split(tmp, ".", file.name);
             fileName = tmp[0];
 
             if (!extends.empty()) {
@@ -442,7 +442,7 @@ namespace phpconvert {
             }
 
             if (!implements.empty()) {
-                this->strings->split(prepType.implements, ",", implements);
+                this->stringHelper->split(prepType.implements, ",", implements);
                 for (string v : prepType.implements) {
                     tmpPrepType.isMain = false;
                     tmpPrepType.type = v;
@@ -508,7 +508,7 @@ namespace phpconvert {
         out.clear();
         unsigned int i = 0;
 
-        strings->split(tmp, "_", className);
+        stringHelper->split(tmp, "_", className);
 
         for (string &part : tmp) {
             if (i + 1 < tmp.size()) {
@@ -526,7 +526,7 @@ namespace phpconvert {
         vector<string> tmp;
         unsigned int i = 0;
 
-        this->strings->split(tmp, "_", className);
+        this->stringHelper->split(tmp, "_", className);
 
         for (string &part : tmp) {
             out += part;
@@ -622,7 +622,7 @@ namespace phpconvert {
                                      vector<string> &tmp) {
         tmp.clear();
 
-        strings->split(tmp, "_", type);
+        stringHelper->split(tmp, "_", type);
 
         return generateAlias(tmp, parts);
     }
@@ -660,7 +660,7 @@ namespace phpconvert {
 
         for (PreparedType &preparedType : file.prepTypes) {
 
-            strings->split(tmpVector, "_", preparedType.type);
+            stringHelper->split(tmpVector, "_", preparedType.type);
 
             className = tmpVector[tmpVector.size() - 1];
 
@@ -796,7 +796,7 @@ namespace phpconvert {
         string tmpString;
         size_t size = 1;
 
-        this->strings->split(tmpVect, "_", outPrep.type);
+        this->stringHelper->split(tmpVect, "_", outPrep.type);
 
         tmpString = tmpVect[tmpVect.size() - 1];
         toLower(tmpString);
@@ -824,14 +824,14 @@ namespace phpconvert {
     void ZendParser::readBuiltInTypes() {
         vector<string> v;
         const char *fileName = "builtInTypes.txt";
-        strings->split(v, "\n", getReader()->readTextFile(fileName));
+        stringHelper->split(v, "\n", getReader()->readTextFile(fileName));
         this->builtInTypes = new set<std::string>(v.begin(), v.end()); //lowercase it
     }
 
     void ZendParser::readKeywords() {
         vector<string> v;
         const char *fileName = "keywords.txt";
-        strings->split(v, "\n", getReader()->readTextFile(fileName));
+        stringHelper->split(v, "\n", getReader()->readTextFile(fileName));
         this->keywords = new set<std::string>(v.begin(), v.end()); //lowercase it
     }
 

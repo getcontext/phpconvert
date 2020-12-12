@@ -122,7 +122,7 @@ namespace phpconvert {
     private:
         DirectoryReader *reader;
         Regexer *regexer;
-        StringHelper *strings;
+        StringHelper *stringHelper;
 
         set<string> *builtInTypes;
         set<string> *keywords;
