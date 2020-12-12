@@ -486,7 +486,7 @@ namespace phpconvert {
 
         file.name = item->name;
         file.fullPath = item->fullPath;
-        file.content = this->reader->readTextFile(item->fullPath);
+        file.content = this->reader->readTextFile(item->fullPath); //make it char*
         file.mainTypes = new set<string>();
 
         prepareTypesMain(file, tmpOut, tmp);

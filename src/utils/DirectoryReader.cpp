@@ -182,6 +182,21 @@ string DirectoryReader::readTextFile(const string path) {
 	myfile.close();
 	return out;
 }
+
+    char* DirectoryReader::readTextFile(const char* path) {
+        string line;
+        string out;
+        ifstream myfile(path);
+        if (myfile.is_open()) {
+            while (getline(myfile, line)) {
+                out += line + "\n";
+            }
+        }
+        myfile.close();
+        return const_cast<char *>(out.c_str());
+    }
+
+
 void DirectoryReader::createDir(const string path) {
 	boost::filesystem::create_directories(path);
 }

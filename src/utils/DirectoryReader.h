@@ -57,8 +57,10 @@ public:
 	 * unix/linux based systems directory separator
 	 */
 	static const string NIX_DS;
+    char *readTextFile(const char* path);
 protected:
     const char* path;
+
 private:
 
 	vector<Item> *result;
