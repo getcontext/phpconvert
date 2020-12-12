@@ -25,7 +25,7 @@ namespace phpconvert {
     class BaseParser {
     public:
         struct PreparedType {
-            string type;
+            string type; //make it char (const char)
             string typeLower;
             string usage;
             string alias;
