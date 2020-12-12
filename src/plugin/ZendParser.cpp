@@ -26,7 +26,7 @@ namespace phpconvert {
     const string ZendParser::RGX_EXCLUDE_COMMENT = "^((?!\\s*\\\\|/\\*|\\*)";
 
 //const char* ZendParser::RGX_TYPE =
-    static const char *const PHP_EXT = ".php";
+    static const char *const PHP_EXT = ".php"; //move to header, can't be
 
     ZendParser::ZendParser() {
         reader = new DirectoryReader();
