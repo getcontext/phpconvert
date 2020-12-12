@@ -195,14 +195,15 @@ namespace phpconvert {
         }
     }
 
+    static const char *const typesRegistryFileName = "typesregistry.txt";
+
     void ZendParser::writeTypesRegistryFile() {
         string typesRegistryString;
         vector<PreparedType>::iterator type = typesRegistry->begin();
         for (; type != typesRegistry->end(); ++type) {
             typesRegistryString += (*type).type + " | " + (*type).raw + "\n";
         }
-        const char *typesRegistryFile = "typesregistry.txt";
-        getReader()->writeTextFile(outputDir + DirectoryReader::getDirectorySeparator() + typesRegistryFile,
+        getReader()->writeTextFile(outputDir + DirectoryReader::getDirectorySeparator() + typesRegistryFileName,
                                    typesRegistryString);
     }
 
