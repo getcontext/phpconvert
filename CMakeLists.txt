@@ -31,8 +31,8 @@ add_executable(
         src/utils/Regexer.cpp
         src/utils/Regexer.h
         src/utils/Regexer_test.cpp
-        src/utils/Strings.cpp
-        src/utils/Strings.h
+        src/utils/StringHelper.cpp
+        src/utils/StringHelper.h
         src/AppManager.cpp
         src/AppManager.h
         src/AppManager_test.cpp

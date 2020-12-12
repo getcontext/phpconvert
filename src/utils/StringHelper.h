@@ -1,5 +1,5 @@
 /*
- * Strings.h
+ * StringHelper.h
  *
  *  Created on: Sep 18, 2014
  *      Author: andy
@@ -17,10 +17,10 @@ using namespace boost;
 
 namespace phpconvert {
 
-class Strings {
+class StringHelper {
 public:
-	Strings();
-	virtual ~Strings();
+	StringHelper();
+	virtual ~StringHelper();
 	void split(vector<string>& out, const string& delim, const string& target);
 	string join(vector<string>& in, string& delim);
 	void replace(string& target, string& from, string& to);

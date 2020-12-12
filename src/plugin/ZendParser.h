@@ -13,7 +13,7 @@
 #include "../BaseParser.h"
 #include "../utils/DirectoryReader.h"
 #include "../utils/Regexer.h"
-#include "../utils/Strings.h"
+#include "../utils/StringHelper.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Include Wave itself
@@ -113,7 +113,7 @@ namespace phpconvert {
 
         void sortSlower(vector<PreparedType> &out);
 
-        void writeFiles(const set<string> &tmpSet, int &generated);
+        void write(const set<string> &tmpSet, int &generated);
 
         void replaceType(PreparedType &type, File &file);
 
@@ -122,7 +122,7 @@ namespace phpconvert {
     private:
         DirectoryReader *reader;
         Regexer *regexer;
-        Strings *strings;
+        StringHelper *strings;
 
         set<string> *builtInTypes;
         set<string> *keywords;
@@ -147,9 +147,13 @@ namespace phpconvert {
                               PreparedType &preparedType,
                               vector<string> &tmpVector, stringstream &stream);
 
-        void processFileObjectOriented(const File &file, set<string> &overlapping, const string &className,
+        void processFileObjectOriented(const File &file, set<string> &duplicatesSet, const string &className,
                                        const string &tmpClassNameLower, size_t size, PreparedType &preparedType,
-                                       vector<string> &tmpVector, stringstream &stream);
+                                       vector<string> &namespaceVector, stringstream &stream);
+
+        bool isDuplicate(set<string> &duplicateSet, const string &className) const;
+
+        void toLower(string &tmp) const;
     };
 
 } /* namespace phpconvert */
