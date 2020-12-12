@@ -12,7 +12,7 @@
 
 #include "../BaseParser.h"
 #include "../utils/DirectoryReader.h"
-#include "../utils/Regexer.h"
+#include "../utils/RegexHelper.h"
 #include "../utils/StringHelper.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ namespace phpconvert {
 
         DirectoryReader *getReader();
 
-        Regexer *getRegexer();
+        RegexHelper *getRegexer();
 
         static const string RGX_INSTANCEOF;
         static const string RGX_NEW;
@@ -121,7 +121,7 @@ namespace phpconvert {
 
     private:
         DirectoryReader *reader;
-        Regexer *regexer;
+        RegexHelper *regexer;
         StringHelper *stringHelper;
 
         set<string> *builtInTypes;

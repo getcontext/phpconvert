@@ -1,11 +1,11 @@
 /*
- * Regexer.cpp
+ * RegexHelper.cpp
  *
  *  Created on: 29 May 2014
  *      Author: winmaster
  */
 
-#include "Regexer.h"
+#include "RegexHelper.h"
 
 #include <iostream>
 #include <string>
@@ -14,16 +14,16 @@ using namespace std;
 
 namespace phpconvert {
 
-Regexer::Regexer() {
+RegexHelper::RegexHelper() {
 	// TODO Auto-generated constructor stub
 
 }
 
-Regexer::~Regexer() {
+RegexHelper::~RegexHelper() {
 	// TODO Auto-generated destructor stub
 }
 
-string Regexer::find(const string& target, const string pattern, int index) {
+string RegexHelper::find(const string& target, const string pattern, int index) {
 	string out;
 	boost::regex expression(pattern);
 	std::string::const_iterator start, end;
@@ -38,8 +38,8 @@ string Regexer::find(const string& target, const string pattern, int index) {
 	return out;
 
 }
-void Regexer::findAll(vector<string>& out, const string& target,
-		const string pattern, int index) {
+void RegexHelper::findAll(vector<string>& out, const string& target,
+                          const string pattern, int index) {
 	out.clear();
 	boost::regex expression(pattern);
 	std::string::const_iterator start, end;
@@ -71,8 +71,8 @@ void Regexer::findAll(vector<string>& out, const string& target,
 
 }
 
-vector<string> Regexer::findAll(const string& target, const string pattern,
-		int index) {
+vector<string> RegexHelper::findAll(const string& target, const string pattern,
+                                    int index) {
 	vector<string> out;
 	boost::regex expression(pattern);
 	std::string::const_iterator start, end;
@@ -99,7 +99,7 @@ vector<string> Regexer::findAll(const string& target, const string pattern,
 	return out;
 }
 
-void Regexer::test(string target, string pattern) {
+void RegexHelper::test(string target, string pattern) {
 	boost::regex expression(pattern);
 	std::string::const_iterator start, end;
 	const string file = target;

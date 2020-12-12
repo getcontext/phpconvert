@@ -1,5 +1,5 @@
 /*
- * Regexer.h
+ * RegexHelper.h
  *
  *  Created on: 29 May 2014
  *      Author: winmaster
@@ -16,10 +16,10 @@ using namespace std;
 
 namespace phpconvert {
 
-class Regexer {
+class RegexHelper {
 public:
-	Regexer();
-	virtual ~Regexer();
+	RegexHelper();
+	virtual ~RegexHelper();
 	string find(const string& target,const string pattern, int index);
 	vector<string> findAll(const string& target,const string pattern, int index);
 	void findAll(vector<string>& out, const string& target,const string pattern, int index);

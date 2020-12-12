@@ -28,8 +28,8 @@ add_executable(
         src/utils/DirectoryReader.cpp
         src/utils/DirectoryReader.h
         src/utils/DirectoryReader_test.cpp
-        src/utils/Regexer.cpp
-        src/utils/Regexer.h
+        src/utils/RegexHelper.cpp
+        src/utils/RegexHelper.h
         src/utils/Regexer_test.cpp
         src/utils/StringHelper.cpp
         src/utils/StringHelper.h
