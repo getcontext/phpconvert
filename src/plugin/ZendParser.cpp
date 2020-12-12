@@ -152,7 +152,7 @@ namespace phpconvert {
 //        vector<PreparedType> tmp;
         for (PreparedType &type : file.prepTypes) {
 //		cout << type.type + "-" +type.alias + "\n";
-            if (this->builtInTypes->find(type.type) == this->builtInTypes->end()) {
+            if (isBuiltInType(type)) {
                 replaceType(type, file);
             }
         }
