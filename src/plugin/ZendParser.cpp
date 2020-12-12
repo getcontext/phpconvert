@@ -201,7 +201,8 @@ namespace phpconvert {
         for (; type != typesRegistry->end(); ++type) {
             typesRegistryString += (*type).type + " | " + (*type).raw + "\n";
         }
-        getReader()->writeTextFile(outputDir + DirectoryReader::getDirectorySeparator() + "typesregistry.txt",
+        const char *typesRegistryFile = "typesregistry.txt";
+        getReader()->writeTextFile(outputDir + DirectoryReader::getDirectorySeparator() + typesRegistryFile,
                                    typesRegistryString);
     }
 
