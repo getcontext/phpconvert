@@ -60,10 +60,12 @@ namespace phpconvert {
 
     static const char *const PHP_TAG_OPEN = "<?php";
 
+    static const char *const PHP_NAMESPACE_TAG_REPLACE = "<?php\n\nnamespace ";
+
     void ZendParser::addNamespace(File &file) {
         if (file.mainType.empty())
             return;
-        string tmp = "<?php\n\nnamespace " + file.namespaceName + ";\n\n";
+        string tmp = PHP_NAMESPACE_TAG_REPLACE + file.namespaceName + ";\n\n";
         string rep = PHP_TAG_OPEN; //@todo fix, make it array, add "<?" , it is also beginning of php files
         //@commit extract isPhp() method
         this->stringHelper->replace(file.content, rep, tmp);
