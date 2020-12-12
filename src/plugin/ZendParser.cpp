@@ -21,10 +21,12 @@ namespace phpconvert {
     const char *ZendParser::RGX_BUILTIN_TYPE =
             "([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
 
-//const char* ZendParser::RGX_TYPE =
 //		"([^\\\\/_\[:alnum:]])(%s)([^\\\\/_\[:alnum:]])";
 
     const string ZendParser::RGX_EXCLUDE_COMMENT = "^((?!\\s*\\\\|/\\*|\\*)";
+
+//const char* ZendParser::RGX_TYPE =
+    static const char *const PHP_EXT = ".php";
 
     ZendParser::ZendParser() {
         reader = new DirectoryReader();
@@ -147,7 +149,7 @@ namespace phpconvert {
     }
 
     void ZendParser::replaceTypes(File &file) {
-        vector<PreparedType> tmp;
+//        vector<PreparedType> tmp;
         for (PreparedType &type : file.prepTypes) {
 //		cout << type.type + "-" +type.alias + "\n";
             if (this->builtInTypes->find(type.type) == this->builtInTypes->end()) {
@@ -157,7 +159,7 @@ namespace phpconvert {
     }
 
     void ZendParser::replaceTypesMain(File &file) {
-        vector<string> tmp;
+//        vector<string> tmp;
         for (PreparedType &type : file.prepTypesMain) {
             type.alias = type.type;
             replaceType(type, file);
@@ -209,7 +211,7 @@ namespace phpconvert {
         for (vector<DirectoryReader::Item>::iterator it = readerResult->begin();
              it != readerResult->end(); ++it) {
             if (!it->isFile ||
-                it->name.find(".php") == string::npos) { //@todo find php3 and all possible native built in extensions
+                it->name.find(PHP_EXT) == string::npos) { //@todo find php3 and all possible native built in extensions
                 continue;
             }
 
