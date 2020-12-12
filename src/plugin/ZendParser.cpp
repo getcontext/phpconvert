@@ -28,6 +28,8 @@ namespace phpconvert {
 //const char* ZendParser::RGX_TYPE =
     static const char *const PHP_EXT = ".php"; //move to header, can't be
 
+    static const char *const TYPES_REGISTRY_FILE_NAME = "typesregistry.txt";
+
     ZendParser::ZendParser() {
         reader = new DirectoryReader();
         stringHelper = new StringHelper();
@@ -56,11 +58,13 @@ namespace phpconvert {
         reader->setPath(sourceDir.c_str());
     }
 
+    static const char *const PHP_TAG_OPEN = "<?php";
+
     void ZendParser::addNamespace(File &file) {
         if (file.mainType.empty())
             return;
         string tmp = "<?php\n\nnamespace " + file.namespaceName + ";\n\n";
-        string rep = "<?php"; //@todo fix, make it array, add "<?" , it is also beginning of php files
+        string rep = PHP_TAG_OPEN; //@todo fix, make it array, add "<?" , it is also beginning of php files
         //@commit extract isPhp() method
         this->stringHelper->replace(file.content, rep, tmp);
     }
@@ -195,15 +199,13 @@ namespace phpconvert {
         }
     }
 
-    static const char *const typesRegistryFileName = "typesregistry.txt";
-
     void ZendParser::writeTypesRegistryFile() {
         string typesRegistryString;
         vector<PreparedType>::iterator type = typesRegistry->begin();
         for (; type != typesRegistry->end(); ++type) {
             typesRegistryString += (*type).type + " | " + (*type).raw + "\n";
         }
-        getReader()->writeTextFile(outputDir + DirectoryReader::getDirectorySeparator() + typesRegistryFileName,
+        getReader()->writeTextFile(outputDir + DirectoryReader::getDirectorySeparator() + TYPES_REGISTRY_FILE_NAME,
                                    typesRegistryString);
     }
 
