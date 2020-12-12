@@ -30,6 +30,10 @@ namespace phpconvert {
 
     static const char *const TYPES_REGISTRY_FILE_NAME = "typesregistry.txt";
 
+    static const char *const PHP_TAG_OPEN = "<?php";
+
+    static const char *const PHP_NAMESPACE_TAG_REPLACE = "<?php\n\nnamespace ";
+
     ZendParser::ZendParser() {
         reader = new DirectoryReader();
         stringHelper = new StringHelper();
@@ -57,10 +61,6 @@ namespace phpconvert {
     void ZendParser::setupReader() {
         reader->setPath(sourceDir.c_str());
     }
-
-    static const char *const PHP_TAG_OPEN = "<?php";
-
-    static const char *const PHP_NAMESPACE_TAG_REPLACE = "<?php\n\nnamespace ";
 
     void ZendParser::addNamespace(File &file) {
         if (file.mainType.empty())
@@ -291,7 +291,7 @@ namespace phpconvert {
         getReader()->createDir(outputDir);
 
         if (isRecurisve())
-            getReader()->read(getReader()->getPath(), "/"); //fix it for windows
+            getReader()->read(getReader()->getPath(), DirectoryReader::getDirectorySeparator()); //fix it for windows
         else
             getReader()->read();
 
