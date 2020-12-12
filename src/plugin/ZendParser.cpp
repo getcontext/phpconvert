@@ -38,7 +38,7 @@ namespace phpconvert {
         readKeywords();
     }
 
-    ZendParser::~ZendParser() {
+    ZendParser::~ZendParser() { //make all pointers delete try catch (cascade)
         delete reader;
         delete stringHelper;
         delete results;
