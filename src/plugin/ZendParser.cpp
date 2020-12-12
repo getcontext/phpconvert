@@ -823,13 +823,15 @@ namespace phpconvert {
 
     void ZendParser::readBuiltInTypes() {
         vector<string> v;
-        strings->split(v, "\n", getReader()->readTextFile("builtInTypes.txt"));
+        const char *fileName = "builtInTypes.txt";
+        strings->split(v, "\n", getReader()->readTextFile(fileName));
         this->builtInTypes = new set<std::string>(v.begin(), v.end()); //lowercase it
     }
 
     void ZendParser::readKeywords() {
         vector<string> v;
-        strings->split(v, "\n", getReader()->readTextFile("keywords.txt"));
+        const char *fileName = "keywords.txt";
+        strings->split(v, "\n", getReader()->readTextFile(fileName));
         this->keywords = new set<std::string>(v.begin(), v.end()); //lowercase it
     }
 
