@@ -275,7 +275,7 @@ namespace phpconvert {
                 replaceTypes(fileCopy);
             }
 
-//            replaceTypesGlobal(fileCopy);
+            replaceTypesGlobal(fileCopy);
 
             getReader()->writeTextFile(
                     outputDir + DirectoryReader::getDirectorySeparator() + fileCopy.rootPath + fileCopy.name,
@@ -373,6 +373,7 @@ namespace phpconvert {
         generatePreparedTypes(file, tmp);
     }
 
+    //@todo isOOP(has class/if) - isProcedural (no classes/if)
     void ZendParser::extractMainType(File &file, vector<string> &out,
                                      vector<string> &tmp) {
         out.clear();
@@ -639,23 +640,24 @@ namespace phpconvert {
         tmpVector.clear();
 
         set<string> duplicatesSet;
-        stringstream stream;
-        string className, classNameLower, tmpString, tmpClassNameLower;
+        stringstream basicStringstream;
+        string className, classNameLower, classNameCompared, classNameComparedLower;
 //	PreparedType preparedType;
         size_t size;
 
         for (PreparedType type : file.prepTypes) {
             className = generateAlias(type.type, 1, tmpVector);
             classNameLower = className;
-            transform(classNameLower.begin(), classNameLower.end(),
-                      classNameLower.begin(), ::tolower);
+//            transform(classNameLower.begin(), classNameLower.end(),
+//                      classNameLower.begin(), ::tolower);
+            toLower(classNameLower);
             int count = 0;
             for (PreparedType typeCompared : file.prepTypes) {
-                tmpString = generateAlias(typeCompared.type, 1, tmpVector);
-                tmpClassNameLower = tmpString;
-                transform(tmpClassNameLower.begin(), tmpClassNameLower.end(),
-                          tmpClassNameLower.begin(), ::tolower);
-                if (classNameLower.compare(tmpClassNameLower) == 0) {
+                classNameCompared = generateAlias(typeCompared.type, 1, tmpVector);
+                classNameComparedLower = classNameCompared;
+                transform(classNameComparedLower.begin(), classNameComparedLower.end(),
+                          classNameComparedLower.begin(), ::tolower);
+                if (classNameLower.compare(classNameComparedLower) == 0) {
                     count++;
                 }
             }
@@ -672,22 +674,22 @@ namespace phpconvert {
 
             className = tmpVector[tmpVector.size() - 1];
 
-            stream.str(string());
-            stream.clear();
+            basicStringstream.str(string());
+            basicStringstream.clear();
             copy(tmpVector.begin(), tmpVector.end(),
-                 std::ostream_iterator<string>(stream, "_"));
-            preparedType.type = stream.str().substr(0, stream.str().length() - 1);
+                 std::ostream_iterator<string>(basicStringstream, "_"));
+            preparedType.type = basicStringstream.str().substr(0, basicStringstream.str().length() - 1);
 
-            tmpClassNameLower = className;
-            transform(tmpClassNameLower.begin(), tmpClassNameLower.end(),
-                      tmpClassNameLower.begin(), ::tolower);
+            classNameComparedLower = className;
+            transform(classNameComparedLower.begin(), classNameComparedLower.end(),
+                      classNameComparedLower.begin(), ::tolower);
 
             if (!hasMainType(file)) {
-                processFileProcedural(file, tmpString, tmpClassNameLower, preparedType, tmpVector, stream);
+                processFileProcedural(file, classNameCompared, classNameComparedLower, preparedType, tmpVector, basicStringstream);
             } else {
 //                cout << "file: " + file.name + " has no classes/interfaces\n";
-                processFileObjectOriented(file, duplicatesSet, className, tmpClassNameLower, size, preparedType,
-                                          tmpVector, stream);
+                processFileObjectOriented(file, duplicatesSet, className, classNameComparedLower, size, preparedType,
+                                          tmpVector, basicStringstream);
             }
         }
 
@@ -789,7 +791,11 @@ namespace phpconvert {
     }
 
     bool ZendParser::isBuiltInType(const BaseParser::PreparedType &preparedType) {
-        return builtInTypes->find(preparedType.type)
+        return isBuiltInType(preparedType.type);
+    }
+
+    bool ZendParser::isBuiltInType(const string &typeName) {
+        return builtInTypes->find(typeName)
                != builtInTypes->end();
     }
 

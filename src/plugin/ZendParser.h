@@ -154,6 +154,8 @@ namespace phpconvert {
         bool isDuplicate(set<string> &duplicateSet, const string &className) const;
 
         void toLower(string &tmp) const;
+
+        bool isBuiltInType(const string &typeName);
     };
 
 } /* namespace phpconvert */
