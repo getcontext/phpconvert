@@ -2,9 +2,12 @@
 converts zend 1 type names to namespace style names, 
 transforms classes , interfaces from Old_Style_Namespace to \New\Style\Namespace , 
 adds usages like 'use \Zend\Db\Sql\Abstract\Class as DbSqlAbstractClass;' and 'namespace \Zend\Db\Sql\Abstract;' (zum beispiel)
-tested with PhpStorm 8,Win64 
+tested with PhpStorm 8,Win64
 
-example command : -d D:/www/digitalus_cms -o D:/phpconvert/digitalus_cms -r
+before running on LINUX, export path to BOOST as follows :
+export LD_LIBRARY_PATH=/path/to/boost:$LD_LIBRARY_PATH
+
+example command : -d D:/www/zend_framework -o D:/phpconvert/zend_framework -r
 
 run options : 
 
