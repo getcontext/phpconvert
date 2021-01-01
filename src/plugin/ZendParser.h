@@ -156,6 +156,8 @@ namespace phpconvert {
         void toLower(string &tmp) const;
 
         bool isBuiltInType(const string &typeName);
+
+        bool isFound(const File &file, const PreparedType &typeCopy) const;
     };
 
 } /* namespace phpconvert */
