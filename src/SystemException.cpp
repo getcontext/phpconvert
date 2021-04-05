@@ -7,6 +7,8 @@
 
 #include "SystemException.h"
 #include <sstream>
+#include <iostream>
+#include <cstring>
 
 using namespace std;
 
@@ -17,10 +19,10 @@ namespace phpconvert {
         code = t;
     }
 
-    SystemException::~SystemException() throw() {
+    SystemException::~SystemException() noexcept {
     }
 
-    const char *SystemException::what() const throw() {
+    const char *SystemException::what() const noexcept {
         stringstream msg;
 
         switch (code) {
@@ -43,7 +45,9 @@ namespace phpconvert {
                 break;
         }
         string str = msg.str();
-        const char *out = str.c_str(); //@todo seems to be pointer as well, make it field
+         const char *out = new char[strlen(str.c_str())+1];
+//        out = str.c_str(); //@todo seems to be pointer as well, make it field
+        std::strcpy(const_cast<char *>(out), str.c_str());
         return out;
     }
 

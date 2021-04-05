@@ -1,8 +1,8 @@
 //============================================================================
 // Name        : phpconvert
-// Author      : Andrzej phpconvert <andrzej.salamon@gmail.com>
+// Author      : Andrzej s <andrzej.salamon@gmail.com>
 // Version     :
-// Copyright   : Copyright by Andrzej phpconvert <andrzej.salamon@gmail.com>
+// Copyright   : Copyright by Andrzej s <andrzej.salamon@gmail.com>
 // Description : php converter, old php 5 to new php 5 with namespaces and usages,
 //               new php code is being generated after processing old one
 //============================================================================
@@ -27,6 +27,7 @@ int main(int argc, char *argv[]) {
 
     AppParams *appParams;
     AppManager *app;
+    const char* message;
 
     appParams = (AppParams()).createFromRequest(argc, argv);
     app = new AppManager();
@@ -34,13 +35,16 @@ int main(int argc, char *argv[]) {
     try {
         app->run(appParams);
     } catch (SystemException &e) {
-        cout << e.what();
+        message =  e.what();
     } catch (exception &e) { //ooopss ;)
-        cout << e.what();
+        message =   e.what();
     }
+
+    cout << message;
 
     delete appParams;
     delete app;
+    delete message;
 
     b.setStop();
     cout << b.getDiff() << "\n";
