@@ -148,7 +148,7 @@ namespace phpconvert {
                               vector<string> &tmpVector, stringstream &stream);
 
         void processFileObjectOriented(const File &file, set<string> &duplicatesSet, const string &className,
-                                       const string &tmpClassNameLower, size_t size, PreparedType &preparedType,
+                                       const string &classNameLower, size_t size, PreparedType &preparedType,
                                        vector<string> &namespaceVector, stringstream &stream);
 
         bool isDuplicate(set<string> &duplicateSet, const string &className) const;
@@ -158,6 +158,13 @@ namespace phpconvert {
         bool isBuiltInType(const string &typeName);
 
         bool isFound(const File &file, const PreparedType &typeCopy) const;
+
+        void debug(const File &file, const PreparedType &typeCopy, const string &classNameLower, string msg) const;
+
+        void processRestricted(const File &file, const string &classNameLower, size_t size, PreparedType &preparedType,
+                               vector<string> &namespaceVector, stringstream &stream);
+
+        bool isRestricted(const string &className, const string &classNameLower);
     };
 
 } /* namespace phpconvert */

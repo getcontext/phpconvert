@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     delete appParams;
     delete app;
-    delete message;
+//    delete message;
 
     b.setStop();
     cout << b.getDiff() << "\n";

@@ -19,10 +19,10 @@ namespace phpconvert {
         code = t;
     }
 
-    SystemException::~SystemException() noexcept {
+    SystemException::~SystemException() throw() {
     }
 
-    const char *SystemException::what() const noexcept {
+    const char *SystemException::what() const throw() {
         stringstream msg;
 
         switch (code) {

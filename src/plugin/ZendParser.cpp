@@ -42,8 +42,8 @@ namespace phpconvert {
         typesRegistry = new vector<PreparedType>();
         typesRegistryUnfiltered = new vector<PreparedType>();
 
-        readBuiltInTypes();
         readKeywords();
+        readBuiltInTypes();
     }
 
     ZendParser::~ZendParser() { //make all pointers delete try catch (cascade)
@@ -118,7 +118,7 @@ namespace phpconvert {
     }
 
     void ZendParser::addUsages(File &file, set<string> tmpSet) {
-        if (file.mainType.empty()) //is structural
+        if (file.mainType.empty()) //is structural //@todo does not matter if oop or not
             return;
         tmpSet.clear();
         string replace = "\n\n\n";
@@ -145,7 +145,7 @@ namespace phpconvert {
         sprintf(out, RGX_BUILTIN_TYPE, type.type.c_str());
         string regexSearch(out);
         replaceFormat = "$1" + type.alias + "$3";
-
+//debug(file, type, "", "replaceFormat: "+replaceFormat+", regexSearch: "+regexSearch+", replaceType");
 //	cout << regexSearch + "-"+
 //	replaceFormat + "\n";
 
@@ -158,38 +158,40 @@ namespace phpconvert {
 //        vector<PreparedType> tmp;
         for (PreparedType &type : file.prepTypes) {
 //		cout << type.type + "-" +type.alias + "\n";
-            if (isBuiltInType(type)) {
+//            if (isBuiltInType(type)) {
                 replaceType(type, file);
-            }
+//            }
         }
     }
 
     void ZendParser::replaceTypesMain(File &file) {
 //        vector<string> tmp;
         for (PreparedType &type : file.prepTypesMain) {
-            type.alias = type.type;
+//            type.alias = type.type;
             replaceType(type, file);
         }
     }
 
     void ZendParser::replaceTypesGlobal(File &file) {
-        PreparedType typeCopy;
+        PreparedType preparedTypeCopy;
         vector<PreparedType>::iterator type = typesRegistry->begin();
         string replaceFormat, typeLower;
         char out[250];
         for (; type != typesRegistry->end(); ++type) {
-            typeCopy = *type;
-            typeLower = typeCopy.type;
-            if (isFound(file, typeCopy)
-                || isBuiltInType(typeCopy)
+            preparedTypeCopy = *type;
+            typeLower = preparedTypeCopy.type;
+            if (isFound(file, preparedTypeCopy)
+                || isBuiltInType(preparedTypeCopy)
                 || isKeyword(typeLower)
                     ) {
                 continue;
             }
 
-            sprintf(out, RGX_BUILTIN_TYPE, typeCopy.type.c_str());
+            sprintf(out, RGX_BUILTIN_TYPE, preparedTypeCopy.type.c_str());
             string regexSearch(out);
-            replaceFormat = "$1" + typeCopy.alias + "$3";
+            replaceFormat = "$1" + preparedTypeCopy.alias + "$3";
+
+//            debug(file, preparedTypeCopy, "", "replaceFormat: "+replaceFormat+", regexSearch: "+regexSearch+", replaceType");
 
             stringHelper->regexReplace(file.content, regexSearch, replaceFormat);
 //				stringHelper->regexReplace(file.firstMainTypeFull, regexSearch,
@@ -199,7 +201,7 @@ namespace phpconvert {
 //
 //				stringHelper->regexReplace(file.content, val.raw, val.replace);
 
-//				this->stringHelper->replace(file.content, typeCopy.type, typeCopy.alias);
+//				this->stringHelper->replace(file.content, preparedTypeCopy.type, preparedTypeCopy.alias);
         }
     }
 
@@ -212,7 +214,10 @@ namespace phpconvert {
         string typesRegistryString;
         vector<PreparedType>::iterator type = typesRegistry->begin();
         for (; type != typesRegistry->end(); ++type) {
-            typesRegistryString += (*type).type + " | " + (*type).raw + "\n";
+            typesRegistryString += "Type:" + (*type).type + "\n" +
+                                   "Alias:" + (*type).alias + "\n"
+//                                   + (*type).raw + "\n"
+                    ;
         }
         getReader()->writeTextFile(outputDir + DirectoryReader::getDirectorySeparator() + TYPES_REGISTRY_FILE_NAME,
                                    typesRegistryString);
@@ -253,16 +258,21 @@ namespace phpconvert {
         File fileCopy;
         for (vector<ZendParser::File>::iterator file = results->begin();
              file != results->end(); ++file) {
-            if (file->name.compare("View.php") != 0){
-                if(file->name.compare("Interface.php") != 0) {
-                    if(file->name.compare("Exception.php") != 0 ) {
-                        continue;
-                    }
-                }
-            }
+//            if (file->name.compare("View.php") != 0) {
+//                if (file->name.compare("Interface.php") != 0) {
+//                    if (file->name.compare("Exception.php") != 0) {
+//                        continue;
+//                    }
+//                }
+//            }
 //            else if (file->name.compare("Interface.php") != 0) {
+//            }
+//            else if (file->name.compare("Exception.php") != 0) {
+//            }
+//            else {
 //                continue;
 //            }
+
 //		if (file->name.compare("Role.php") != 0) {
 //			continue;
 //		}
@@ -289,7 +299,7 @@ namespace phpconvert {
                 replaceTypes(fileCopy);
             }
 
-            replaceTypesGlobal(fileCopy);
+//            replaceTypesGlobal(fileCopy);
 
             getReader()->writeTextFile(
                     outputDir + DirectoryReader::getDirectorySeparator() + fileCopy.rootPath + fileCopy.name,
@@ -507,7 +517,7 @@ namespace phpconvert {
 
         file.name = item->name;
         file.fullPath = item->fullPath;
-        file.content = this->reader->readTextFile(item->fullPath); //make it char*
+        file.content = getReader()->readTextFile(item->fullPath); //make it char*
         file.mainTypes = new set<string>();
 
         prepareTypesMain(file, tmpOut, tmp);
@@ -671,10 +681,13 @@ namespace phpconvert {
                 if (classNameLower.compare(classNameComparedLower) == 0) {
                     count++;
                 }
+//                if (type.type.compare(typeCompared.type) == 0) {
+//                    count++;
+//                }
             }
             if (count > 1
-                || isBuiltInType(className)) {
-                duplicatesSet.insert(className);
+                || isBuiltInType(type.type)) {
+                duplicatesSet.insert(type.type);
             }
         }
 
@@ -682,7 +695,7 @@ namespace phpconvert {
 
             stringHelper->split(tmpVector, "_", preparedType.type);
 
-            className = tmpVector[tmpVector.size() - 1];
+            className = tmpVector[tmpVector.size() - 1]; //@todo use full type to commpare
 
             basicStringstream.str(string());
             basicStringstream.clear();
@@ -690,13 +703,16 @@ namespace phpconvert {
                  std::ostream_iterator<string>(basicStringstream, "_"));
             preparedType.type = basicStringstream.str().substr(0, basicStringstream.str().length() - 1);
 
+//            debug(file, preparedType, classNameLower, preparedType.type + ": preparedType.type = basicStringstream.str().substr(0, basicStringstream.str().length() - 1)");
+
             classNameComparedLower = className;
             toLower(classNameComparedLower);
 
             if (!hasMainType(file)) {
-//                if (file.nam e == "Abstract.php") cout << "Abstract.php Procedural\n";
-                processFileProcedural(file, classNameCompared, classNameComparedLower, preparedType, tmpVector,
-                                      basicStringstream);
+//                if (file.name == "Abstract.php") cout << "Abstract.php Procedural\n";
+//                cout << file.name + " Procedural\n";
+//                processFileProcedural(file, classNameCompared, classNameComparedLower, preparedType, tmpVector,
+//                                      basicStringstream);
             } else {
 //                if (file.name == "Abstract.php") cout << "Abstract.php OOP\n";
 //                cout << "file: " + file.name + " has no classes/interfaces\n";
@@ -710,38 +726,28 @@ namespace phpconvert {
     void
     ZendParser::processFileObjectOriented(const BaseParser::File &file, set<string> &duplicatesSet,
                                           const string &className,
-                                          const string &tmpClassNameLower, size_t size,
+                                          const string &classNameLower, size_t size,
                                           BaseParser::PreparedType &preparedType, vector<string> &namespaceVector,
                                           stringstream &stream) {
-        if (isKeyword(tmpClassNameLower)
-//            && !isMainType(file, preparedType)
-                ) {
-//            if (namespaceVector.size() == 2) {
-            size = 2;
-//            } else {
-//                size = namespaceVector.size() - 1;
-//            }
-            preparedType.alias = generateAlias(namespaceVector, size);
-            stream.clear();
-            stream.str(string()); //make it double secured
-            copy(namespaceVector.begin(), namespaceVector.end() - 1,
-                 ostream_iterator<string>(stream, "_"));
-            generateNamespace(
-                    stream.str().substr(0, stream.str().length() - 1) + "_"
-                    + generateAlias(namespaceVector, 2), preparedType.usage);
-
+        if (isRestricted(className, classNameLower)/*&& !isMainType(file, preparedType)*/) {
+//            debug(file, preparedType, classNameLower, "isRestricted(className, classNameLower)");
+            processRestricted(file, classNameLower, size, preparedType, namespaceVector, stream);
         } else if (isMainType(file, preparedType)) {
-            if (isKeyword(tmpClassNameLower)) {
+//            debug(file, preparedType, classNameLower, "isMainType(file, preparedType)");
+            size = 1;
+            if (isRestricted(className, classNameLower)) { //isSameTypeFromDifferentNamespace
                 size = 2;
-            } else {
-                size = 1;
             }
             preparedType.alias = generateAlias(namespaceVector, size);
             preparedType.usage = "";
-        } else if (isBuiltInType(preparedType)) {
+//            debug(file, preparedType, classNameLower, "alias: " + preparedType.alias);
+
+        } else if (isBuiltInType(classNameLower)) {
+//            debug(file, preparedType, classNameLower, "isBuiltInType(preparedType)");
             preparedType.alias = "\\\\" + preparedType.type;
             preparedType.usage = "";
-        } else if (isDuplicate(duplicatesSet, className)) {
+        } else if (isDuplicate(duplicatesSet, className)) { //many
+//            debug(file, preparedType, classNameLower, "isDuplicate(duplicatesSet, className)");
             if (namespaceVector.size() == 2) {
                 size = 2;
             } else {
@@ -750,9 +756,40 @@ namespace phpconvert {
             preparedType.alias = generateAlias(namespaceVector, size);
             generateNamespace(preparedType.type, preparedType.usage);
         } else {
+//            debug(file, preparedType, classNameLower, "else (no case)");
             preparedType.alias = generateAlias(namespaceVector, 1);
             generateNamespace(preparedType.type, preparedType.usage);
         }
+    }
+
+    bool ZendParser::isRestricted(const string &className, const string &classNameLower) {
+        return isKeyword(classNameLower)
+               || isBuiltInType(className);
+    }
+
+    void ZendParser::processRestricted(const BaseParser::File &file, const string &classNameLower, size_t size,
+                                       BaseParser::PreparedType &preparedType, vector<string> &namespaceVector,
+                                       stringstream &stream) {
+//        debug(file, preparedType, classNameLower, "isKeyword(classNameLower) || isBuiltInType(className)");
+//            if (namespaceVector.size() == 2) {
+        size = 2;
+//            } else {
+//                size = namespaceVector.size() - 1;
+//            }
+        preparedType.alias = generateAlias(namespaceVector, size);
+        stream.clear();
+        stream.str(string()); //make it double secured
+        copy(namespaceVector.begin(), namespaceVector.end() - 1,
+             ostream_iterator<string>(stream, "_"));
+        generateNamespace(
+                stream.str().substr(0, stream.str().length() - 1) + "_"
+                + generateAlias(namespaceVector, 2), preparedType.usage);
+    }
+
+    void ZendParser::debug(const BaseParser::File &file, const PreparedType &typeCopy, const string &classNameLower,
+                           string msg) const {
+        if (file.fullPath.find("Zend/View/Exception") != std::string::npos)
+            cout << /*file.fullPath + file.name + */", type full: " + typeCopy.type + ", classname: " + classNameLower + ", " + msg + "\n";
     }
 
     bool ZendParser::isDuplicate(set<string> &duplicateSet,
@@ -854,16 +891,20 @@ namespace phpconvert {
 
     void ZendParser::readBuiltInTypes() {
         vector<string> v;
-        const char *fileName = "builtInTypes.txt";
-        stringHelper->split(v, "\n", getReader()->readTextFile(fileName));
+        string fileName = "builtintypes.txt";
+        string txt = getReader()->readTextFile(fileName);
+        stringHelper->split(v, "\n", txt);
         this->builtInTypes = new set<std::string>(v.begin(), v.end()); //lowercase it
+        cout << "builtInTypes size " << builtInTypes->size() << "\n";
     }
 
     void ZendParser::readKeywords() {
         vector<string> v;
-        const char *fileName = "keywords.txt";
-        stringHelper->split(v, "\n", getReader()->readTextFile(fileName));
+        string fileName = "keywords.txt";
+        string txt = getReader()->readTextFile(fileName);
+        stringHelper->split(v, "\n", txt);
         this->keywords = new set<std::string>(v.begin(), v.end()); //lowercase it
+        cout << "keywords size " << keywords->size() << "\n";
     }
 
 /**
