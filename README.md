@@ -5,7 +5,7 @@ adds usages like 'use \Zend\Db\Sql\Abstract\Class as DbSqlAbstractClass;' and 'n
 tested with PhpStorm 8,Win64
 
 before running on LINUX, export path to BOOST as follows :
-export LD_LIBRARY_PATH=/path/to/boost:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/path/to/boost/stage/lib:$LD_LIBRARY_PATH
 
 example command : -d D:/www/zend_framework -o D:/phpconvert/zend_framework -r
 
