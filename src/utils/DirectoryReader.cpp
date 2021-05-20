@@ -171,13 +171,26 @@ namespace phpconvert {
         return myfile.is_open();
     }
 
-    string DirectoryReader::readTextFile(const string path) {
+//    string DirectoryReader::readTextFile(const string path) {
+//        string line;
+//        string out;
+//        ifstream myfile(path.c_str());
+//        if (myfile.is_open()) {
+//            while (getline(myfile, line)) {
+//                out += line + "\n";
+//            }
+//        }
+//        myfile.close();
+//        return out;
+//    }
+
+    string *DirectoryReader::readTextFile(const string path) {
         string line;
-        string out;
+        string *out = new string();
         ifstream myfile(path.c_str());
         if (myfile.is_open()) {
             while (getline(myfile, line)) {
-                out += line + "\n";
+                *out += line + "\n";
             }
         }
         myfile.close();
