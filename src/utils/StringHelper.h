@@ -17,16 +17,24 @@ using namespace boost;
 
 namespace phpconvert {
 
-class StringHelper {
-public:
-	StringHelper();
-	virtual ~StringHelper();
-	void split(vector<string>& out, const string& delim, const string& target);
-	string join(vector<string>& in, string& delim);
-	void replace(string& target, string& from, string& to);
-	void regexReplace(string& target, string& from, string& to);
-	void regexReplace(string* target, string& from, string& to);
-};
+    class StringHelper {
+    public:
+        StringHelper();
+
+        virtual ~StringHelper();
+
+        void split(vector<string> &out, const string &delim, const string &target);
+
+        void split(vector<string> &out, const string &delim, const string *target);
+
+        string join(vector<string> &in, string &delim);
+
+        void replace(string &target, string &from, string &to);
+
+        void regexReplace(string &target, string &from, string &to);
+
+        void regexReplace(string *target, string &from, string &to);
+    };
 
 } /* namespace phpconvert */
 
