@@ -26,13 +26,15 @@ namespace phpconvert {
     const string ZendParser::RGX_EXCLUDE_COMMENT = "^((?!\\s*\\\\|/\\*|\\*)";
 
 //const char* ZendParser::RGX_TYPE =
-    static const char *const PHP_EXT = ".php"; //move to header, can't be
+    static const char *const PHP_EXT = ".php"; //move to header, can't be (php3, etc all extensions)
 
     static const char *const TYPES_REGISTRY_FILE_NAME = "typesregistry.txt";
 
     static const char *const PHP_TAG_OPEN = "<?php";
 
     static const char *const PHP_NAMESPACE_TAG_REPLACE = "<?php\n\nnamespace ";
+
+    static const char *const NAMESPACE_SEPARATOR = "\\";
 
     ZendParser::ZendParser() {
         reader = new DirectoryReader();
@@ -518,7 +520,7 @@ namespace phpconvert {
         file.name = item->name;
         file.fullPath = item->fullPath;
         file.content = getReader()->readTextFile(item->fullPath); //make it char*
-        file.mainTypes = new set<string>();
+        file.mainTypes = new set<string>(); //@todo delete it
 
         prepareTypesMain(file, tmpOut, tmp);
 
@@ -547,7 +549,7 @@ namespace phpconvert {
             if (i + 1 < tmp.size()) {
                 out += part;
                 if (i + 2 < tmp.size()) {
-                    out += "\\";
+                    out += NAMESPACE_SEPARATOR;
                 }
             }
             i++;
@@ -564,17 +566,17 @@ namespace phpconvert {
         for (string &part : tmp) {
             out += part;
             if (i + 1 < tmp.size()) {
-                out += "\\";
+                out += NAMESPACE_SEPARATOR;
             }
             i++;
         }
     }
 
-    void ZendParser::sortFaster(vector<PreparedType> &out) {
+    void ZendParser::sortFaster(vector<PreparedType> &out) { //@todo const here (vector)
         set<PreparedType> foos(out.begin(), out.end());
         out.clear();
         std::set<PreparedType>::iterator it;
-        for (it = foos.begin(); it != foos.end(); ++it) {
+        for (it = foos.begin(); it != foos.end(); ++it) { //@todo const here (vector)
             out.push_back(*it);
         }
     }
@@ -662,7 +664,7 @@ namespace phpconvert {
     void ZendParser::generatePreparedTypes(File &file, vector<string> &tmpVector) {
         tmpVector.clear();
 
-        set<string> duplicatesSet;
+        set<string> duplicatesSet; //@todo must know full namespace too, not only class name
         stringstream basicStringstream;
         string className, classNameLower, classNameCompared, classNameComparedLower;
 //	PreparedType preparedType;
@@ -711,11 +713,10 @@ namespace phpconvert {
             if (!hasMainType(file)) {
 //                if (file.name == "Abstract.php") cout << "Abstract.php Procedural\n";
 //                cout << file.name + " Procedural\n";
-//                processFileProcedural(file, classNameCompared, classNameComparedLower, preparedType, tmpVector,
-//                                      basicStringstream);
+                processFileProcedural(file, classNameCompared, classNameComparedLower, preparedType, tmpVector,
+                                      basicStringstream);
             } else {
 //                if (file.name == "Abstract.php") cout << "Abstract.php OOP\n";
-//                cout << "file: " + file.name + " has no classes/interfaces\n";
                 processFileObjectOriented(file, duplicatesSet, className, classNameComparedLower, size, preparedType,
                                           tmpVector, basicStringstream);
             }
@@ -763,8 +764,8 @@ namespace phpconvert {
     }
 
     bool ZendParser::isRestricted(const string &className, const string &classNameLower) {
-        return isKeyword(classNameLower)
-               || isBuiltInType(className);
+        return isKeyword(classNameLower) //cant be keyword here , keywords must not be touched
+               || isBuiltInType(className); //@todo isDuplicate too
     }
 
     void ZendParser::processRestricted(const BaseParser::File &file, const string &classNameLower, size_t size,
@@ -772,7 +773,7 @@ namespace phpconvert {
                                        stringstream &stream) {
 //        debug(file, preparedType, classNameLower, "isKeyword(classNameLower) || isBuiltInType(className)");
 //            if (namespaceVector.size() == 2) {
-        size = 2;
+        size = 2; //namespace + className
 //            } else {
 //                size = namespaceVector.size() - 1;
 //            }
@@ -817,12 +818,12 @@ namespace phpconvert {
                     stream.str().substr(0, stream.str().length() - 1) + "_"
                     + alias, tmpString);
 
-            preparedType.alias = "\\" + tmpString;
+            preparedType.alias = NAMESPACE_SEPARATOR + tmpString;
 //				    cout <<"isKeyword alias: "<<preparedType.alias<<"\n";
         } else {
 //                    cout <<"standard type alias: \n";
             generateNamespace(preparedType.type, preparedType.alias);
-            preparedType.alias = "\\" + preparedType.alias;
+            preparedType.alias = NAMESPACE_SEPARATOR + preparedType.alias;
 //				    cout <<preparedType.alias<<"\n";
         }
     }
@@ -856,7 +857,7 @@ namespace phpconvert {
     void ZendParser::generatePreparedTypeFull(PreparedType &outPrep,
                                               vector<string> &tmpVect) {
         if (outPrep.type.find("_") == string::npos) {
-            outPrep.alias = "\\" + outPrep.type; //extract const - ns sep.
+            outPrep.alias = NAMESPACE_SEPARATOR + outPrep.type; //extract const - ns sep.
             return;
         }
 
@@ -877,7 +878,7 @@ namespace phpconvert {
         tmpString += "_" + generateAlias(outPrep.type, size, tmpVect);
         generateNamespace(tmpString, outPrep.alias);
 
-        outPrep.alias = "\\" + outPrep.alias;
+        outPrep.alias = NAMESPACE_SEPARATOR + outPrep.alias;
     }
 
     void ZendParser::toLower(string &tmp) const { transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower); }

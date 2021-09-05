@@ -34,18 +34,14 @@ namespace phpconvert {
 
         virtual void parse();
 
-        DirectoryReader *getReader();
-
-        RegexHelper *getRegexer();
-
         static const string RGX_INSTANCEOF;
+
         static const string RGX_NEW;
         static const string RGX_SIGNATURE;
         static const string RGX_STATIC_CALL;
         static const string RGX_MAIN_TYPE;
         static const string RGX_THROW_NEW;
         static const char *RGX_BUILTIN_TYPE;
-
         static const string RGX_EXCLUDE_COMMENT;
 
         File buildFile(DirectoryReader::Item *item,
@@ -53,6 +49,11 @@ namespace phpconvert {
                        vector<string> &tmp);
 
     protected:
+
+        DirectoryReader *getReader();
+
+        RegexHelper *getRegexer();
+
         void setupReader();
 
         void readBuiltInTypes();
@@ -118,6 +119,8 @@ namespace phpconvert {
         void replaceType(PreparedType &type, File &file);
 
         string stripCmments(string const &input);
+
+        bool isInBraces(string const &input); //is replace in braces ?
 
     private:
         DirectoryReader *reader;
