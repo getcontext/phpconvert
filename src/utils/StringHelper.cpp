@@ -25,6 +25,13 @@ void StringHelper::split(vector<string>& out, const string& delim, const string&
 	else
 		out.push_back(source);
 }
+//void StringHelper::split(vector<string>& out, const string& delim, const string *source) {
+//    out.clear();
+//    if (source->find(delim) != string::npos)
+//        boost::split(out, source, is_any_of(delim), token_compress_on);
+//    else
+//        out.push_back(source);
+//}
 string StringHelper::join(vector<string>& in, string& delim) {
 	return boost::algorithm::join(in, delim);
 }
