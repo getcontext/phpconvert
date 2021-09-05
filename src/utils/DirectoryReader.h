@@ -44,8 +44,8 @@ public:
 	const char* getPath();
 	vector<Item> *getResults();
 	static DirectoryReader::OS getOS();
-//	string readTextFile(const string path);
-    string *readTextFile(const string path);
+	string readTextFile(const string path);
+//    string *readTextFile(const string path);
 	bool writeTextFile(const string path, const string& content);
 	void createDir(const string path);
     void removeDir(const string path);
