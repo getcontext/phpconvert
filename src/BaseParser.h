@@ -54,7 +54,7 @@ namespace phpconvert {
             string firstMainTypeFull;
             string content;
 
-            set<string> *mainTypes;
+            set<string> *mainTypes; //add destructor here
             vector<string> types;
             vector<PreparedType> prepTypes;
             vector<PreparedType> prepTypesMain;

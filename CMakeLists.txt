@@ -4,6 +4,12 @@ project(phpconvert)
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_CXX_STANDARD 11)
 
+set(Boost_USE_STATIC_LIBS        ON)  # only find static libs
+set(Boost_USE_DEBUG_LIBS        OFF)  # ignore debug libs and
+set(Boost_USE_RELEASE_LIBS       ON)  # only find release libs
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+
 set(Boost_INCLUDE_DIR /home/wizard/apps/boost_1_66_0)
 set(Boost_LIBRARY_DIR ${Boost_INCLUDE_DIR}/stage/lib/)
 
@@ -13,6 +19,7 @@ include_directories(src)
 include_directories(src/plugin)
 include_directories(src/utils)
 
+find_package(Boost 1.66.0 REQUIRED)
 find_package(Boost 1.66.0 REQUIRED COMPONENTS thread system filesystem regex wave)
 
 link_directories(${Boost_LIBRARY_DIR})
@@ -49,8 +56,8 @@ add_executable(
         src/SystemException.cpp
         src/SystemException.h
         src/SystemException_test.cpp
-#        src/plugin/Php7Parser.cpp
-#        src/plugin/Php7Parser.h
+        src/plugin/Php7Parser.cpp
+        src/plugin/Php7Parser.h
 #        src/utils/CString.cpp
 #        src/utils/CString.h
 )

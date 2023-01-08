@@ -11,8 +11,9 @@ namespace phpconvert {
     class Php7Parser : public ZendParser {
     public:
         Php7Parser();
-
         virtual ~Php7Parser();
+        //@todo handle CameCaseDelimeterClassName , make it enum, no explict calls, isCamelCase(cost char *word)
+        constexpr static const char *const DELIMETER = "";
     protected:
 //        PhpReturnType *detectReturnType(PhpMethod method);
 //        PhpReturnType *detectReturnType(PhpFunction func);
