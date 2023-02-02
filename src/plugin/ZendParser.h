@@ -168,6 +168,8 @@ namespace phpconvert {
                                vector<string> &namespaceVector, stringstream &stream);
 
         bool isRestricted(const string &className, const string &classNameLower);
+
+        bool hasDelimeter(const PreparedType &outPrep) const;
     };
 
 } /* namespace phpconvert */

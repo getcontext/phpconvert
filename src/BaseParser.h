@@ -32,6 +32,8 @@ namespace phpconvert {
             string raw;
             string replace;
             bool isMain = false;
+            bool isBuiltIn = false;
+            bool isKeyword = false;
             string extends;
             vector<string> implements;
 
