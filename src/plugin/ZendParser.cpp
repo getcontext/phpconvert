@@ -281,10 +281,10 @@ namespace phpconvert {
 //		if (file->name.compare("Role.php") != 0) {
 //			continue;
 //		}
-//				if (file->name.compare("Registry.php")) {
-//					continue;
-//				}
-//		else if (file->name.compare("Exception.php")) {
+//        if (file->name.compare("Registry.php")) {
+//            continue;
+//        }
+//		if (file->name.compare("Exception.php")!=0) {
 //			continue;
 //		}
 //		if (file->name.compare("Initializer.php")) {
@@ -296,6 +296,7 @@ namespace phpconvert {
             fileCopy = *file;
             getReader()->createDir(outputDir + DirectoryReader::getDirectorySeparator() + file->rootPath);
             replaceTypesBuiltIn(fileCopy); //@todo problem here
+            replaceTypesGlobal(fileCopy);
 //		cout << fileCopy.mainType << "\n";
             if (fileCopy.mainType.length() > 0) {
 
@@ -304,7 +305,6 @@ namespace phpconvert {
                 replaceTypes(fileCopy);
             }
 
-//            replaceTypesGlobal(fileCopy);
 
             getReader()->writeTextFile(
                     outputDir + DirectoryReader::getDirectorySeparator() + fileCopy.rootPath + fileCopy.name,
@@ -667,7 +667,7 @@ namespace phpconvert {
     void ZendParser::generatePreparedTypes(File &file, vector<string> &tmpVector) {
         tmpVector.clear();
 
-        set<string> duplicatesSet; //@todo must know full namespace too, not only class name
+        set<PreparedType> duplicatesSet; //@todo must know full namespace too, not only class name
         stringstream basicStringstream;
         string className, classNameLower, classNameCompared, classNameComparedLower;
 //	PreparedType preparedType;
@@ -692,7 +692,8 @@ namespace phpconvert {
             }
             if (count > 1
                 || isBuiltInType(type.type)) {
-                duplicatesSet.insert(type.type);
+//                cout << "\nduplicate: " << type.type;
+                duplicatesSet.insert(type);
             }
         }
 
@@ -728,7 +729,7 @@ namespace phpconvert {
     }
 
     void
-    ZendParser::processFileObjectOriented(const BaseParser::File &file, set<string> &duplicatesSet,
+    ZendParser::processFileObjectOriented(const BaseParser::File &file, set<PreparedType> &duplicatesSet,
                                           const string &className,
                                           const string &classNameLower, size_t size,
                                           BaseParser::PreparedType &preparedType, vector<string> &namespaceVector,
@@ -737,6 +738,7 @@ namespace phpconvert {
 //            debug(file, preparedType, classNameLower, "isRestricted(className, classNameLower)");
 //            processRestricted(file, classNameLower, size, preparedType, namespaceVector, stream);
 //        }
+//@todo it must be a check, if class is not a collision with others globablly from different namespaces
         if (isKeyword(classNameLower)) {
             debug(file, preparedType, classNameLower, "isKeyword(classNameLower)");
             size = 2; //namespace + className
@@ -761,13 +763,9 @@ namespace phpconvert {
             preparedType.usage = "";
             debug(file, preparedType, className, "alias: " + preparedType.alias);
 
-        } else if (isDuplicate(duplicatesSet, className)) { //many
+        } else if (isDuplicate(duplicatesSet, preparedType)) { //many
             debug(file, preparedType, className, "isDuplicate(duplicatesSet, className)");
-            if (namespaceVector.size() == 2) {
-                size = 2;
-            } else {
-                size = namespaceVector.size() - 1;
-            }
+            size = namespaceVector.size() - 1; //use full name alias, do not shorten
             preparedType.alias = generateAlias(namespaceVector, size);
             generateNamespace(preparedType.type, preparedType.usage);
 
@@ -820,9 +818,9 @@ namespace phpconvert {
                     ", " + msg + "\n";
     }
 
-    bool ZendParser::isDuplicate(set<string> &duplicateSet,
-                                 const string &className) const {
-        return duplicateSet.find(className) != duplicateSet.end();
+    bool ZendParser::isDuplicate(const set<PreparedType> &duplicateSet,
+                                 const PreparedType &preparedType) const {
+        return duplicateSet.find(preparedType) != duplicateSet.end();
     }
 
     void
@@ -855,6 +853,12 @@ namespace phpconvert {
         }
     }
 
+    /**
+     * is type main type of file (like class or interface)
+     * @param file
+     * @param preparedType
+     * @return
+     */
     bool ZendParser::isMainType(const BaseParser::File &file,
                                 const BaseParser::PreparedType &preparedType) const {
         return preparedType.type.compare(file.mainType) == 0;
@@ -876,6 +880,11 @@ namespace phpconvert {
         return isBuiltInType(preparedType.type);
     }
 
+    /**
+     * Does type is built in php type
+     * @param typeName
+     * @return
+     */
     bool ZendParser::isBuiltInType(const string &typeName) {
         return builtInTypes->find(typeName)
                != builtInTypes->end();
@@ -966,6 +975,10 @@ namespace phpconvert {
             }
         }
         return output;
+    }
+
+    void ZendParser::fixAlias(const File &file, const PreparedType &preparedType) const {
+
     }
 } /* namespace Salamon */
 

@@ -46,6 +46,9 @@ namespace phpconvert {
             }
         };
 
+        /**
+         * simple struct for file read from disk representation
+         */
         struct File {
             string name;
             string fullPath;
@@ -56,7 +59,7 @@ namespace phpconvert {
             string firstMainTypeFull;
             string content;
 
-            set<string> *mainTypes; //add destructor here
+            set<string> *mainTypes; //add destructor here, clean it up
             vector<string> types;
             vector<PreparedType> prepTypes;
             vector<PreparedType> prepTypesMain;

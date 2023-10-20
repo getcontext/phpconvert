@@ -150,11 +150,11 @@ namespace phpconvert {
                               PreparedType &preparedType,
                               vector<string> &tmpVector, stringstream &stream);
 
-        void processFileObjectOriented(const File &file, set<string> &duplicatesSet, const string &className,
+        void processFileObjectOriented(const File &file, set<PreparedType> &duplicatesSet, const string &className,
                                        const string &classNameLower, size_t size, PreparedType &preparedType,
                                        vector<string> &namespaceVector, stringstream &stream);
 
-        bool isDuplicate(set<string> &duplicateSet, const string &className) const;
+        bool isDuplicate(const set<PreparedType> &duplicateSet, const PreparedType &preparedType) const;
 
         void toLower(string &tmp) const;
 
@@ -170,6 +170,8 @@ namespace phpconvert {
         bool isRestricted(const string &className, const string &classNameLower);
 
         bool hasDelimeter(const PreparedType &outPrep) const;
+
+        void fixAlias(const File &file,     const PreparedType &preparedType) const;
     };
 
 } /* namespace phpconvert */
