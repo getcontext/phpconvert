@@ -172,6 +172,9 @@ namespace phpconvert {
         bool hasDelimeter(const PreparedType &outPrep) const;
 
         void fixAlias(const File &file,     const PreparedType &preparedType) const;
+
+        void
+        generateUsage(size_t size, PreparedType &preparedType, vector<string> &namespaceVector, stringstream &stream);
     };
 
 } /* namespace phpconvert */

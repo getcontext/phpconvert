@@ -686,9 +686,9 @@ namespace phpconvert {
                 if (classNameLower.compare(classNameComparedLower) == 0) {
                     count++;
                 }
-//                if (type.type.compare(typeCompared.type) == 0) {
-//                    count++;
-//                }
+                if (type.type.compare(typeCompared.type) == 0) { //is self type , so continue
+                    continue;
+                }
             }
             if (count > 1
                 || isBuiltInType(type.type)) {
@@ -734,21 +734,12 @@ namespace phpconvert {
                                           const string &classNameLower, size_t size,
                                           BaseParser::PreparedType &preparedType, vector<string> &namespaceVector,
                                           stringstream &stream) {
-//        if (isRestricted(className, classNameLower)&& !isMainType(file, preparedType)) {
-//            debug(file, preparedType, classNameLower, "isRestricted(className, classNameLower)");
-//            processRestricted(file, classNameLower, size, preparedType, namespaceVector, stream);
-//        }
 //@todo it must be a check, if class is not a collision with others globablly from different namespaces
         if (isKeyword(classNameLower)) {
             debug(file, preparedType, classNameLower, "isKeyword(classNameLower)");
             size = 2; //namespace + className
             preparedType.alias = generateAlias(namespaceVector, size);
-            stream.clear();
-            stream.str(string()); //make it double secured
-            copy(namespaceVector.begin(), namespaceVector.end() - 1,
-                 ostream_iterator<string>(stream, DELIMETER)); //@todo extract it to PreparedType
-            generateNamespace(stream.str().substr(0, stream.str().length() - 1) + DELIMETER
-                              + generateAlias(namespaceVector, size), preparedType.usage);
+            generateUsage(size, preparedType, namespaceVector, stream);
         } else if (isBuiltInType(className) && !hasDelimeter(preparedType)) { //is php reserverd type
             debug(file, preparedType, className, "isBuiltInType(preparedType)");
             preparedType.alias = "\\\\" + preparedType.type;
@@ -764,10 +755,12 @@ namespace phpconvert {
             debug(file, preparedType, className, "alias: " + preparedType.alias);
 
         } else if (isDuplicate(duplicatesSet, preparedType)) { //many
-            debug(file, preparedType, className, "isDuplicate(duplicatesSet, className)");
-            size = namespaceVector.size() - 1; //use full name alias, do not shorten
-            preparedType.alias = generateAlias(namespaceVector, size);
-            generateNamespace(preparedType.type, preparedType.usage);
+            debug(file, preparedType, className, "isDuplicate(duplicatesSet, preparedType)");
+//            size = namespaceVector.size(); //use full name alias, do not shorten
+            size=2;
+            preparedType.alias = generateAlias(namespaceVector, size); //alias might be longer than class name, when same classes from different namespace
+//            generateNamespace(preparedType.type, preparedType.usage); //@todo type must end as alias, replace last part with alias
+            generateUsage(size, preparedType, namespaceVector, stream);
 
         } else {
             size = 1;
@@ -777,14 +770,18 @@ namespace phpconvert {
             debug(file, preparedType, className, "else (no case)");
             preparedType.alias = generateAlias(namespaceVector, size);
 //            generateNamespace(preparedType.type, preparedType.usage);
-            stream.clear();
-            stream.str(string()); //make it double secured
-            copy(namespaceVector.begin(), namespaceVector.end() - 1,
-                 ostream_iterator<string>(stream, DELIMETER)); //@todo extract it to PreparedType
-            generateNamespace(stream.str().substr(0, stream.str().length() - 1) + DELIMETER
-                              + generateAlias(namespaceVector, size), preparedType.usage);
+            generateUsage(size, preparedType, namespaceVector, stream);
 
         }
+    }
+
+    void ZendParser::generateUsage(size_t size, BaseParser::PreparedType &preparedType, vector<string> &namespaceVector,
+                                   stringstream &stream) {
+        stream.clear();
+        stream.str(string()); //make it double secured
+        copy(namespaceVector.begin(), namespaceVector.end() - 1,ostream_iterator<string>(stream, DELIMETER)); //@todo extract it to PreparedType
+        generateNamespace(stream.str().substr(0, stream.str().length() - 1) + DELIMETER
+                          + preparedType.alias, preparedType.usage);
     }
 
     bool ZendParser::isRestricted(const string &className, const string &classNameLower) { //@todo has no sense
@@ -792,28 +789,9 @@ namespace phpconvert {
                || isBuiltInType(className); //@todo isDuplicate too
     }
 
-//    void ZendParser::processRestricted(const BaseParser::File &file, const string &classNameLower, size_t size,
-//                                       BaseParser::PreparedType &preparedType, vector<string> &namespaceVector,
-//                                       stringstream &stream) {
-////        debug(file, preparedType, classNameLower, "isKeyword(classNameLower) || isBuiltInType(className)");
-////            if (namespaceVector.size() == 2) {
-//        size = 2; //namespace + className
-////            } else {
-////                size = namespaceVector.size() - 1;
-////            }
-//        preparedType.alias = generateAlias(namespaceVector, size);
-//        stream.clear();
-//        stream.str(string()); //make it double secured
-//        copy(namespaceVector.begin(), namespaceVector.end() - 1,
-//             ostream_iterator<string>(stream, DELIMETER));
-//        generateNamespace(
-//                stream.str().substr(0, stream.str().length() - 1) + DELIMETER
-//                + generateAlias(namespaceVector, 2), preparedType.usage);
-//    }
-
     void ZendParser::debug(const BaseParser::File &file, const PreparedType &typeCopy, const string &classNameLower,
                            string msg) const {
-        if (file.fullPath.find("Zend/View/Exception") != std::string::npos)
+        if (file.fullPath.find("Zend/Paginator/Exception") != std::string::npos)
             cout << file.fullPath + file.name + ", type full: " + typeCopy.type + ", classname: " + classNameLower +
                     ", " + msg + "\n";
     }
