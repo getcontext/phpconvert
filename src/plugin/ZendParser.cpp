@@ -230,17 +230,14 @@ namespace phpconvert {
 
     void ZendParser::buildFiles(File file, vector<string> tmpOut, int &processed,
                                 vector<DirectoryReader::Item> *readerResult,
-                                vector<pair<string, string> > &tmpOutPairs, vector<string> &tmpVector) {
-        for (vector<DirectoryReader::Item>::iterator it = readerResult->begin();
-             it != readerResult->end(); ++it) {
+                                vector<pair<string, string> > &tmpOutPairs,
+                                vector<string> &tmpVector) {
+        vector<DirectoryReader::Item>::iterator it;
+        for (it = readerResult->begin(); it != readerResult->end(); ++it) {
             if (!it->isFile ||
                 it->name.find(PHP_EXT) == string::npos) { //@todo find php3 and all possible native built in extensions
                 continue;
             }
-
-//		if (it->name.compare("Select.php") != 0) {
-//			continue;
-//		}
 
             file = buildFile(&(*it), tmpOutPairs, tmpOut, tmpVector);
             processed++;
@@ -261,8 +258,8 @@ namespace phpconvert {
     void ZendParser::write(const set<string> &tmpSet, int &generated) {
         generated = 0;
         File fileCopy;
-        for (vector<ZendParser::File>::iterator file = results->begin();
-             file != results->end(); ++file) {
+        vector<ZendParser::File>::iterator file;
+        for (file = results->begin(); file != results->end(); ++file) {
 //            if (file->name.compare("View.php") != 0) {
 //                if (file->name.compare("Interface.php") != 0) {
 //                    if (file->name.compare("Exception.php") != 0) {
@@ -298,12 +295,12 @@ namespace phpconvert {
             replaceTypesBuiltIn(fileCopy); //@todo problem here
             replaceTypesGlobal(fileCopy);
 //		cout << fileCopy.mainType << "\n";
-            if (fileCopy.mainType.length() > 0) {
+//            if (fileCopy.mainType.length() > 0) {
 
                 addNamespace(fileCopy);
                 addUsages(fileCopy, tmpSet);
                 replaceTypes(fileCopy);
-            }
+//            }
 
 
             getReader()->writeTextFile(
@@ -315,9 +312,9 @@ namespace phpconvert {
 
     void ZendParser::parse() {
         setupReader();
-
-        getReader()->removeDir(outputDir);
-        getReader()->createDir(outputDir);
+//@todo add overwrite
+//        getReader()->removeDir(outputDir);
+//        getReader()->createDir(outputDir);
 
         if (isRecurisve())
             getReader()->read(getReader()->getPath(), DirectoryReader::getDirectorySeparator()); //fix it for windows
@@ -337,9 +334,9 @@ namespace phpconvert {
         filterPreparedTypes(*typesRegistryUnfiltered, *typesRegistry);
         generatePreparedTypesGlobal(tmpVector);
 
-        write(tmpSet, generated);
-
-        writeTypesRegistryFile();
+//        write(tmpSet, generated);
+//
+//        writeTypesRegistryFile();
 
         cout << "\n";
         cout << "files processed : " << processed << "\n";
@@ -402,20 +399,23 @@ namespace phpconvert {
         generatePreparedTypes(file, tmp);
     }
 
-    //@todo isOOP(has class/if) - isProcedural (no classes/if)
+    //@todo isOOP(has class/if) - isProcedural (no classes/if) - has it sense ?
+
     void ZendParser::extractMainType(File &file, vector<string> &out,
                                      vector<string> &tmp) {
         out.clear();
         tmp.clear();
         int step = 9;
-        regexer->findAll(tmp, file.content.c_str(), RGX_MAIN_TYPE, -1);
-//	if (file.name.compare("Role.php") == 0) {
+
+        const string lineStripped = stripCmments(file.content);
+        regexer->findAll(tmp, lineStripped.c_str(), RGX_MAIN_TYPE, -1);
+//	if (file.name.compare("Navigation.php") == 0) {
 //		cout << "\n";
-//	}
-//	int i = 0;
-//	for (string v : tmp) {
-//		cout << i++ << ":" << v << "\n";
-//	}
+//        int i = 0;
+//        for (string v : tmp) {
+//            cout << i++ << ":" << v << "\n";
+//        }
+//    }
 
         size_t size = tmp.size();
         if (size > 0) {
@@ -570,6 +570,22 @@ namespace phpconvert {
             out += part;
             if (i + 1 < tmp.size()) {
                 out += NAMESPACE_SEPARATOR;
+            }
+            i++;
+        }
+    }
+    void ZendParser::generateNamespace(const string &className, string &out, int index) {
+        out.clear();
+        vector<string> tmp;
+        unsigned int i = 0;
+
+        this->stringHelper->split(tmp, DELIMETER, className);
+
+        for (string &part: tmp) {
+            out += part;
+            if (i + 1 < tmp.size()) {
+                out += NAMESPACE_SEPARATOR;
+                if(i==index) return;
             }
             i++;
         }
@@ -757,9 +773,14 @@ namespace phpconvert {
         } else if (isDuplicate(duplicatesSet, preparedType)) { //many
             debug(file, preparedType, className, "isDuplicate(duplicatesSet, preparedType)");
 //            size = namespaceVector.size(); //use full name alias, do not shorten
-            size=2;
-            preparedType.alias = generateAlias(namespaceVector, size); //alias might be longer than class name, when same classes from different namespace
-//            generateNamespace(preparedType.type, preparedType.usage); //@todo type must end as alias, replace last part with alias
+            size = 3;
+            preparedType.alias = generateAlias(namespaceVector,
+                                               size); //alias might be longer than class name, when same classes from different namespace
+            generateNamespace(preparedType.type, preparedType.usage , 1); //here type is safe, non-colliding - use 3size alias and 1size class name
+            size = 1;
+            if (isBuiltInType(className)) { //isSameTypeFromDifferentNamespace
+                size = 2;
+            }
             generateUsage(size, preparedType, namespaceVector, stream);
 
         } else {
@@ -779,9 +800,10 @@ namespace phpconvert {
                                    stringstream &stream) {
         stream.clear();
         stream.str(string()); //make it double secured
-        copy(namespaceVector.begin(), namespaceVector.end() - 1,ostream_iterator<string>(stream, DELIMETER)); //@todo extract it to PreparedType
+        copy(namespaceVector.begin(), namespaceVector.end() - 1,
+             ostream_iterator<string>(stream, DELIMETER)); //@todo extract it to PreparedType
         generateNamespace(stream.str().substr(0, stream.str().length() - 1) + DELIMETER
-                          + preparedType.alias, preparedType.usage);
+                          + generateAlias(namespaceVector, size), preparedType.usage);
     }
 
     bool ZendParser::isRestricted(const string &className, const string &classNameLower) { //@todo has no sense
