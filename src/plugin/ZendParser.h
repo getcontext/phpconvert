@@ -82,6 +82,8 @@ namespace phpconvert {
 
         void generateNamespace(const string &className, string &out);
 
+        void generateNamespace(const string &className, string &out, int index);
+
         void addNamespace(File &file);
 
         void addUsages(File &file, set<string> tmpSet);
