@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
     AppParams *appParams;
     AppManager *app;
     const char* message;
+    exception ex;
 
     appParams = (AppParams()).createFromRequest(argc, argv);
     app = new AppManager();
@@ -35,8 +36,10 @@ int main(int argc, char *argv[]) {
     try {
         app->run(appParams);
     } catch (SystemException &e) {
+        ex = e;
         message =  e.what();
     } catch (exception &e) { //ooopss ;)
+        ex = e;
         message =   e.what();
     }
 
