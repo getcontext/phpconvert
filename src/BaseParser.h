@@ -63,6 +63,10 @@ namespace phpconvert {
             vector<string> types;
             vector<PreparedType> prepTypes;
             vector<PreparedType> prepTypesMain;
+
+            ~File(){
+                delete[] mainTypes;
+            }
         };
 
         BaseParser();
