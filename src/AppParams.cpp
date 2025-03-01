@@ -18,13 +18,13 @@ namespace phpconvert {
 
         for (int i = 1; i < argc; i += 1) {
             current = argv[i];
-            if (current.compare("-r") == 0) {
+            if (current == "-r") {
                 obj->recursive = true;
-            } else if (current.compare("-d") == 0) {
+            } else if (current == "-d") {
                 obj->path = argv[i + 1];
                 obj->setValid(true);
                 i++;
-            } else if (current.compare("-o") == 0) {
+            } else if (current == "-o") {
                 obj->outputPath = argv[i + 1];
                 i++;
             }
