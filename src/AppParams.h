@@ -23,7 +23,7 @@ namespace phpconvert {
 
         AppParams *createFromRequest(int argc, char *argv[]);
 
-        bool isValid();
+        bool isValid() const;
 
     private:
         bool valid;

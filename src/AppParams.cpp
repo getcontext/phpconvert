@@ -37,7 +37,7 @@ namespace phpconvert {
         this->recursive = recursive;
     }
 
-    bool AppParams::isValid() {
+    bool AppParams::isValid() const {
         return valid;
     }
 
