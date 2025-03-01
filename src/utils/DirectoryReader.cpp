@@ -164,7 +164,7 @@ namespace phpconvert {
         ofstream myfile;
         myfile.open(path.c_str());
         if (!myfile.is_open()) {
-            throw new std::invalid_argument("Can't write file :" + path);
+            throw std::invalid_argument("Can't write file :" + path);
         }
         myfile << content;
         myfile.close();
