@@ -177,6 +177,8 @@ namespace phpconvert {
 
         void
         generateUsage(size_t size, PreparedType &preparedType, vector<string> &namespaceVector, stringstream &stream);
+
+        void findRequireOrInclude(); //@todo add more stuff here, regex in file content
     };
 
 } /* namespace phpconvert */

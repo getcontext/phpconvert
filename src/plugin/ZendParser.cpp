@@ -138,6 +138,7 @@ namespace phpconvert {
         }
         replace += "\n\n\n";
         replace += file.firstMainTypeFull;
+        //@todo this stuff doesn't work for inlined require include
         this->stringHelper->replace(file.content, file.firstMainTypeFull, replace);
     }
 
