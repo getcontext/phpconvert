@@ -26,17 +26,17 @@ namespace phpconvert {
     const string ZendParser::RGX_EXCLUDE_COMMENT = "^((?!\\s*\\\\|/\\*|\\*)";
 
 //const char* ZendParser::RGX_TYPE =
-    static const char *const PHP_EXT = ".php"; //@todo move to header, can't be (php3, etc all extensions)
+    const char *const ZendParser::PHP_EXT = ".php"; //@todo move to header, can't be (php3, etc all extensions)
 
-    static const char *const TYPES_REGISTRY_FILE_NAME = "typesregistry.txt";
+     const char *const ZendParser::TYPES_REGISTRY_FILE_NAME = "typesregistry.txt";
 
-    static const char *const PHP_TAG_OPEN = "<?php";
+     const char *const ZendParser::PHP_TAG_OPEN = "<?php";
 
-    static const char *const PHP_NAMESPACE_TAG_REPLACE = "<?php\n\nnamespace "; //@todo cant combine tag_open+tag_replace on compile time
+     const char *const ZendParser::PHP_NAMESPACE_TAG_REPLACE = "<?php\n\nnamespace "; //@todo cant combine tag_open+tag_replace on compile time
 
-    static const char *const NAMESPACE_SEPARATOR = "\\";
+     const char *const ZendParser::NAMESPACE_SEPARATOR = "\\";
 
-    static const char *const DELIMETER = "_";
+     const char *const ZendParser::DELIMETER = "_";
 
     ZendParser::ZendParser() {
         reader = new DirectoryReader();

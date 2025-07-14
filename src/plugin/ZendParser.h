@@ -179,6 +179,12 @@ namespace phpconvert {
         generateUsage(size_t size, PreparedType &preparedType, vector<string> &namespaceVector, stringstream &stream);
 
         void findRequireOrInclude(); //@todo add more stuff here, regex in file content
+        static const char *const PHP_EXT;
+        static const char *const TYPES_REGISTRY_FILE_NAME;
+        static const char *const PHP_TAG_OPEN;
+        static const char *const PHP_NAMESPACE_TAG_REPLACE;
+        static const char *const NAMESPACE_SEPARATOR;
+        static const char *const DELIMETER;
     };
 
 } /* namespace phpconvert */

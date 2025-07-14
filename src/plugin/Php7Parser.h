@@ -15,8 +15,8 @@ namespace phpconvert {
         //@todo handle CameCaseDelimeterClassName , make it enum, no explict calls, isCamelCase(cost char *word)
         constexpr static const char *const DELIMETER = "";
     protected:
-//        PhpReturnType *detectReturnType(PhpMethod method);
-//        PhpReturnType *detectReturnType(PhpFunction func);
+//        PhpReturnType *detectReturnType(Method method);
+//        PhpReturnType *detectReturnType(Function func);
         //write test
     };
 }

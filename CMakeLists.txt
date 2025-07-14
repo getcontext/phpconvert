@@ -58,7 +58,9 @@ add_executable(
         src/SystemException_test.cpp
         src/plugin/Php7Parser.cpp
         src/plugin/Php7Parser.h
-#        src/utils/CString.cpp
+        src/plugin/LinuxKernelParser.cpp
+        src/plugin/LinuxKernelParser.h
+        #        src/utils/CString.cpp
 #        src/utils/CString.h
 )
 
